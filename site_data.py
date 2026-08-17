@@ -669,6 +669,9 @@ PANELS = {"session-1a", "session-3a"}
 INFO_INTRO = ("A few details to help you prepare for a day of learning, networking and "
               "sharing at the IFC Cape Town Pop-Up.")
 
+VENUE_Q = "Homecoming+Centre+Caledon+Street+District+Six+Cape+Town"
+PARKING_Q = "Harrington+Square+Parking+27+Caledon+Street+Cape+Town"
+
 INFO_BLOCKS = [
     {
         "heading": "Start planning your day",
@@ -682,18 +685,28 @@ INFO_BLOCKS = [
     {
         "heading": "How to get there",
         "body": ["The Homecoming Centre, corner of Buitenkant and Caledon Street "
-                 "(entrance on Caledon Street), District Six, Cape Town 7785."],
-        "link": {"label": "Open in Maps",
-                 "url": "https://www.google.com/maps/search/?api=1&query="
-                        "Homecoming+Centre+Caledon+Street+District+Six+Cape+Town"},
+                 "(entrance on Caledon Street), District Six, Cape Town 7785.",
+                 "Cape Town Station is about a 10-minute walk away."],
+        "links": [
+            {"label": "Google Maps",
+             "url": f"https://www.google.com/maps/search/?api=1&query={VENUE_Q}"},
+            {"label": "Apple Maps", "url": f"https://maps.apple.com/?q={VENUE_Q}"},
+            {"label": "Train & transit times",
+             "url": f"https://www.google.com/maps/dir/?api=1&destination={VENUE_Q}"
+                    "&travelmode=transit"},
+        ],
     },
     {
         "heading": "Parking",
-        "body": ["Some paid parking is available at Harrington Square Parking Lot, "
-                 "27 Caledon Street, District Six, Cape Town 7925."],
-        "link": {"label": "Open in Maps",
-                 "url": "https://www.google.com/maps/search/?api=1&query="
-                        "Harrington+Square+Parking+27+Caledon+Street+Cape+Town"},
+        "body": ["Paid parking is available at Harrington Square Parking Lot, "
+                 "27 Caledon Street, District Six, Cape Town 7925.",
+                 "There is also some street parking in the surrounding blocks, though it "
+                 "fills up early."],
+        "links": [
+            {"label": "Google Maps",
+             "url": f"https://www.google.com/maps/search/?api=1&query={PARKING_Q}"},
+            {"label": "Apple Maps", "url": f"https://maps.apple.com/?q={PARKING_Q}"},
+        ],
     },
     {
         "heading": "What to bring",
@@ -703,18 +716,33 @@ INFO_BLOCKS = [
     },
     {
         "heading": "Get social",
-        "body": ["Follow the IFC Cape Town Pop-Up, CCA Recruitment and Consulting, and "
-                 "The Resource Alliance to stay up to date with all the news and coverage."],
+        "html": 'Follow <a href="https://www.linkedin.com/company/ifc-cape-town/" '
+                'target="_blank" rel="noopener">the IFC Cape Town Pop-Up</a>, '
+                '<a href="https://www.linkedin.com/company/the-resource-alliance/" '
+                'target="_blank" rel="noopener">The Resource Alliance</a> and '
+                '<a href="https://www.linkedin.com/company/charity-careers-africa/" '
+                'target="_blank" rel="noopener">CCA Recruitment and Consulting</a> to stay '
+                'up to date with all the news and coverage. Tag us in your posts and use '
+                'the hashtag below.',
         "hashtag": "#IFCCPT2026",
     },
     {
         "heading": "Questions?",
-        "html": 'Email us at <a href="mailto:shawnlifebiz@gmail.com">'
-                'shawnlifebiz@gmail.com</a> and we will help.',
+        "body": ["Get in touch and we will help."],
+        # Assembled by JS so the address is not sitting in the page source for
+        # scrapers; <noscript> shows it for anyone without JavaScript.
+        "email": True,
     },
 ]
 
 INFO_OUTRO = "We are looking forward to seeing you on Wednesday, 2 September."
+
+# Split so the plain address never appears as a single string in the HTML.
+CONTACT_EMAIL_USER = "shawnlifebiz"
+CONTACT_EMAIL_HOST = "gmail.com"
+
+# Event photography credit (the hero and 2025 photos).
+PHOTO_CREDIT = {"name": "LIFEbrand", "url": "https://lifebrand.co.za/"}
 
 
 # ---------------------------------------------------------------------------

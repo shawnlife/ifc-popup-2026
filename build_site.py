@@ -133,6 +133,12 @@ header{
   padding:34px 18px 38px;margin-bottom:6px;
   border-radius:16px;overflow:hidden;background:var(--bg);
 }
+/* Full-bleed: cancel the .wrap padding and the centred max-width so the photo
+   runs edge to edge. body has overflow-x:hidden, so no sideways scroll. */
+.hero.has-photo{
+  margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);
+  width:100vw;max-width:100vw;border-radius:0;
+}
 /* The photo sits behind a navy scrim so white text stays legible over it and
    the bottom edge fades into the page. Phones get the 900px file. */
 .hero.has-photo::before{
@@ -169,12 +175,17 @@ header{
 
 /* ---------- schedule ---------- */
 .slot{
-  display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px;
+  display:grid;grid-template-columns:84px minmax(0,1fr);gap:8px;
   padding:12px 0;border-top:1px solid var(--line);
 }
-@media (min-width:760px){.slot{grid-template-columns:104px minmax(0,1fr);gap:18px;padding:14px 0}}
-.slot-time{font-weight:700;font-size:.78rem;color:var(--orange);line-height:1.35;padding-top:11px}
-@media (min-width:760px){.slot-time{font-size:.9rem}}
+@media (min-width:760px){.slot{grid-template-columns:112px minmax(0,1fr);gap:18px;padding:14px 0}}
+/* nowrap + a column wide enough for the longest label, so every time sits on
+   one line — a mix of one- and two-line times looked ragged. */
+.slot-time{
+  font-weight:700;font-size:.72rem;color:var(--orange);line-height:1.35;
+  padding-top:12px;white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+@media (min-width:760px){.slot-time{font-size:.9rem;padding-top:11px}}
 .rooms{display:grid;gap:10px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:760px){.rooms{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 .card{
@@ -197,7 +208,7 @@ a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
 .card .who a{color:var(--text);text-decoration:underline;
   text-decoration-color:rgba(255,255,255,.4);text-underline-offset:2px}
 .card .who a:hover{color:var(--orange);text-decoration-color:var(--orange)}
-.card .who .note{color:var(--muted)}
+.card .who .note{color:var(--text)}
 .card .detail{font-size:.87rem;color:var(--text);margin:0}
 .card .topics{margin-top:8px}
 
@@ -215,28 +226,34 @@ a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
 .badge.time{color:var(--text);border-color:var(--line-strong);letter-spacing:.04em}
 .badge.topic{color:#c9d8ff;border-color:rgba(201,216,255,.35);background:rgba(201,216,255,.07)}
 
-/* ---------- filters ---------- */
+/* ---------- filters: native selects, compact on a phone ---------- */
 .filters{
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-  padding:14px;margin:0 0 18px;
+  padding:14px;margin:0 0 16px;display:grid;gap:12px;grid-template-columns:minmax(0,1fr);
 }
-.fgroup{display:flex;align-items:center;gap:8px;padding:5px 0;min-width:0}
-.fgroup + .fgroup{border-top:1px solid var(--line);margin-top:5px;padding-top:10px}
+@media (min-width:700px){.filters{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.fgroup{display:flex;flex-direction:column;gap:6px;min-width:0}
 .flabel{
-  flex:0 0 62px;font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;
+  font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;
   font-weight:700;color:var(--orange);
 }
-@media (min-width:760px){.flabel{flex-basis:76px}}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0;scrollbar-width:none;flex:1 1 auto}
-.chips::-webkit-scrollbar{display:none}
-@media (min-width:760px){.chips{flex-wrap:wrap;overflow:visible}}
-.chip{
-  flex:0 0 auto;min-height:38px;padding:0 13px;border-radius:999px;
-  border:1px solid var(--line-strong);background:none;color:var(--muted);
-  font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;
+.fselect{position:relative}
+/* Chevron drawn in CSS so the control matches in every browser. */
+.fselect::after{
+  content:'';position:absolute;right:14px;top:50%;width:8px;height:8px;
+  border-right:2px solid var(--orange);border-bottom:2px solid var(--orange);
+  transform:translateY(-70%) rotate(45deg);pointer-events:none;
 }
-.chip:hover{color:#fff;border-color:var(--muted)}
-.chip[aria-pressed=true]{background:var(--orange);border-color:var(--orange);color:#241f10}
+.fselect select{
+  appearance:none;-webkit-appearance:none;width:100%;min-height:46px;
+  padding:0 38px 0 14px;border-radius:9px;
+  border:1px solid var(--line-strong);background:rgba(0,0,0,.18);color:var(--text);
+  font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;
+}
+.fselect select:hover{border-color:var(--muted)}
+.fselect select:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+/* Native dropdown lists render with the OS palette, so force readable colours. */
+.fselect option{background:#3D3F5A;color:#fff}
 .fresult{display:flex;align-items:center;gap:12px;margin:0 0 16px;
   font-size:.85rem;color:var(--muted)}
 .fclear{
@@ -260,11 +277,10 @@ a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
 .session h3{margin:0 0 10px;color:var(--orange);font-size:1.05rem;line-height:1.3}
 @media (min-width:760px){.session h3{font-size:1.2rem}}
 .session .who{font-size:.92rem;color:var(--text);margin:0 0 12px}
-.session .who .lbl{color:var(--muted)}
 .session .who a{color:var(--text);font-weight:600;text-decoration:underline;
   text-decoration-color:rgba(255,255,255,.4);text-underline-offset:2px}
 .session .who a:hover{color:var(--orange);text-decoration-color:var(--orange)}
-.session .who .note{color:var(--muted);font-weight:400}
+.session .who .note{color:var(--text);font-weight:400}
 .session p.desc{margin:0;color:var(--text);font-size:.95rem}
 
 /* ---------- speakers ---------- */
@@ -272,23 +288,26 @@ a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
 @media (min-width:560px){.speakers{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:900px){.speakers{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .spk{
-  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);border:1px solid rgba(244,148,4,.26);
+  border-radius:var(--radius);
   padding:20px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;
   scroll-margin-top:calc(var(--nav-h) + 14px);
+  transition:border-color .15s, background-color .15s;
 }
+.spk:hover{border-color:var(--orange);background:var(--surface-2)}
 .spk img{
   width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:50% 50%;
-  border:2px solid rgba(255,255,255,.16);background:var(--surface-2);margin-bottom:14px;
+  border:2px solid rgba(244,148,4,.45);background:var(--surface-2);margin-bottom:14px;
 }
+.spk:hover img{border-color:var(--orange)}
 .spk h3{margin:0 0 5px;font-size:1rem;line-height:1.3}
 .spk .role{margin:0;color:var(--muted);font-size:.85rem;line-height:1.45}
 .spk .org{margin:0;color:var(--text);font-size:.85rem;font-weight:600;line-height:1.45}
 .spk .in-session{margin:10px 0 0;font-size:.8rem;line-height:1.4}
-.spk .in-session .lbl{display:block;color:var(--orange);font-size:.62rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
-.spk .in-session a{color:var(--text);text-decoration:underline;
-  text-decoration-color:rgba(255,255,255,.35);text-underline-offset:2px}
-.spk .in-session a:hover{color:var(--orange);text-decoration-color:var(--orange)}
+.spk .in-session a{color:var(--orange);font-weight:600;text-decoration:none}
+.spk .in-session a:hover{color:var(--text);text-decoration:underline;
+  text-underline-offset:2px}
+.spk .in-session .note{display:block;color:var(--muted);font-size:.76rem}
 .spk .pending-note{margin:8px 0 0;color:var(--muted);font-size:.8rem;font-style:italic}
 .actions{margin-top:auto;padding-top:16px;display:flex;gap:8px;
   justify-content:center;flex-wrap:wrap;width:100%}
@@ -315,15 +334,19 @@ html:not(.js) .learn-btn{display:none}
 
 /* ---------- speaker modal ---------- */
 .modal{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;
-  justify-content:center;padding:0}
+  justify-content:center;
+  /* Keep the card clear of the phone browser's URL bar, or the close button
+     ends up underneath it and is nearly untappable. */
+  padding:calc(84px + env(safe-area-inset-top)) 0 0}
 @media (min-width:640px){.modal{align-items:center;padding:24px}}
 .modal-backdrop{position:absolute;inset:0;background:rgba(16,17,26,.72);
   backdrop-filter:blur(3px)}
 .modal-card{
   position:relative;background:var(--surface);border:1px solid var(--line-strong);
-  border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:92vh;
-  overflow-y:auto;padding:26px 20px 24px;text-align:center;
-  -webkit-overflow-scrolling:touch;
+  border-radius:16px 16px 0 0;width:100%;max-width:560px;
+  max-height:100%;
+  overflow-y:auto;padding:26px 20px calc(24px + env(safe-area-inset-bottom));
+  text-align:center;-webkit-overflow-scrolling:touch;
 }
 @media (min-width:640px){.modal-card{border-radius:16px;padding:30px 32px 28px;max-height:86vh}}
 .modal-x{
@@ -345,11 +368,10 @@ html:not(.js) .learn-btn{display:none}
 .spk-detail .bio + .bio{margin-top:10px}
 #modal-body .in-session{margin:0 0 16px;padding:12px 14px;background:rgba(0,0,0,.16);
   border-left:3px solid var(--orange);border-radius:8px;font-size:.88rem}
-#modal-body .in-session .lbl{display:block;color:var(--orange);font-size:.62rem;
-  font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
-#modal-body .in-session a{color:var(--text);font-weight:600;text-decoration:underline;
-  text-decoration-color:rgba(255,255,255,.4);text-underline-offset:2px}
-#modal-body .in-session a:hover{color:var(--orange);text-decoration-color:var(--orange)}
+#modal-body .in-session a{color:var(--orange);font-weight:700;text-decoration:none}
+#modal-body .in-session a:hover{color:var(--text);text-decoration:underline;
+  text-underline-offset:2px}
+#modal-body .in-session .note{color:var(--muted)}
 .modal-foot{margin-top:20px}
 html.modal-open,html.modal-open body{overflow:hidden}
 
@@ -404,29 +426,56 @@ html.modal-open,html.modal-open body{overflow:hidden}
 }
 .info-link:hover{background:var(--orange);color:#241f10;text-decoration:none}
 .info-link svg{width:13px;height:13px;fill:currentColor}
+.info-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.info-links .info-link{margin-top:0}
 .info-outro{
   margin:20px 0 0;text-align:center;color:var(--text);font-size:.95rem;font-weight:600;
 }
 
-/* ---------- sponsors: one pale band, not nine white tiles ---------- */
-.sponsors-wrap{margin-top:46px;padding:34px 0 38px;background:#EEEFF5;border-radius:16px}
-.sponsors-wrap h2{margin:0 0 24px;text-align:center;font-size:1.05rem;color:#303249}
-.sponsors{display:flex;flex-wrap:wrap;gap:26px 34px;justify-content:center;
-  align-items:center;list-style:none;margin:0;padding:0 24px}
-.sponsors li{display:flex;align-items:center;justify-content:center}
-.sponsors a{display:flex;align-items:center;justify-content:center;padding:4px;
-  border-radius:6px}
-.sponsors a:hover{outline:2px solid var(--orange);outline-offset:4px;text-decoration:none}
-.sponsors img{max-height:42px;max-width:150px;width:auto;height:auto;display:block}
-@media (min-width:760px){.sponsors img{max-height:50px;max-width:180px}}
+/* ---------- sponsors ----------
+   One white panel, not nine tiles. White specifically: Donorbox and Downes
+   Murray have opaque white backgrounds baked in, so they only sit seamlessly on
+   white, while Turning Point's is opaque dark navy and reads as a dark logo.
+   Nine logos divide evenly into 3x3, so there is no orphan row. */
+.sponsors-wrap{margin-top:46px;padding:30px 0 34px;background:#fff;border-radius:16px}
+.sponsors-wrap h2{
+  margin:0 0 22px;text-align:center;font-size:.95rem;color:#303249;letter-spacing:.06em;
+}
+.sponsors{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px 4px;list-style:none;margin:0;padding:0 16px;
+}
+@media (min-width:640px){
+  .sponsors{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 10px;padding:0 28px}
+}
+/* Odd one out on a 2-column phone layout: centre it across both columns. */
+.sponsors li:last-child{grid-column:1 / -1}
+@media (min-width:640px){.sponsors li:last-child{grid-column:auto}}
+.sponsors a{
+  display:flex;align-items:center;justify-content:center;
+  min-height:78px;padding:10px 12px;border-radius:8px;
+}
+@media (min-width:640px){.sponsors a{min-height:92px;padding:12px 16px}}
+.sponsors a:hover{background:#F2F3F8;text-decoration:none}
+.sponsors a:focus-visible{outline:3px solid var(--orange);outline-offset:-2px}
+.sponsors img{max-height:44px;max-width:100%;width:auto;height:auto;display:block}
+@media (min-width:640px){.sponsors img{max-height:52px}}
 
 footer{
-  border-top:1px solid var(--line);padding:26px 0 34px;
+  border-top:1px solid var(--line);padding:38px 0 36px;
   text-align:center;color:var(--muted);font-size:.84rem;
 }
 /* Needs to out-specify .wrap's "margin:0 auto", which would zero this out. */
 footer.wrap{margin-top:44px}
-footer p{margin:0 0 8px}
+footer p{margin:0 0 10px}
+footer .foot-cta{margin:0 0 18px}
+footer .foot-cta a{
+  display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 24px;
+  border-radius:999px;background:var(--orange);color:#241f10;
+  font-weight:700;font-size:.88rem;text-transform:uppercase;letter-spacing:.05em;
+}
+footer .foot-cta a:hover{background:#ffa61f;text-decoration:none}
+footer .foot-cta svg{width:13px;height:13px;fill:currentColor}
 footer .credit{font-size:.78rem;opacity:.8}
 footer .credit a{color:var(--muted);text-decoration:underline}
 footer .credit a:hover{color:var(--orange)}
@@ -651,26 +700,27 @@ JS = """
     clearBtn.hidden = !active;
   }
 
-  document.addEventListener('click', function(ev){
-    var chip = ev.target && ev.target.closest ? ev.target.closest('.chip') : null;
-    if(chip){
-      var key = chip.getAttribute('data-filter');
-      state[key] = chip.getAttribute('data-value');
-      document.querySelectorAll('.chip[data-filter="' + key + '"]').forEach(function(c){
-        c.setAttribute('aria-pressed', c === chip ? 'true' : 'false');
-      });
+  var selects = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
+  selects.forEach(function(sel){
+    sel.addEventListener('change', function(){
+      state[sel.getAttribute('data-filter')] = sel.value;
       applyFilters();
-      return;
-    }
-    if(ev.target.closest && ev.target.closest('#fclear')){
-      state = { room:'all', time:'all', topic:'all' };
-      document.querySelectorAll('.chip').forEach(function(c){
-        c.setAttribute('aria-pressed', c.getAttribute('data-value') === 'all' ? 'true' : 'false');
-      });
-      applyFilters();
-    }
+    });
+  });
+  if(clearBtn) clearBtn.addEventListener('click', function(){
+    state = { room:'all', time:'all', topic:'all' };
+    selects.forEach(function(sel){ sel.value = 'all'; });
+    applyFilters();
   });
   if(cards.length) applyFilters();
+
+  /* ---------------- contact address, assembled at runtime ---------------- */
+  var mail = document.getElementById('email-link');
+  if(mail){
+    var addr = mail.getAttribute('data-u') + String.fromCharCode(64) + mail.getAttribute('data-h');
+    mail.href = 'mailto:' + addr + '?subject=' +
+      encodeURIComponent('IFC Cape Town Pop-Up 2026');
+  }
 
   /* ---------------- deep link from a QR or shared link ---------------- */
   if(location.hash) syncFromHash();
@@ -784,20 +834,18 @@ def render_schedule():
 
 
 def render_filters():
-    def group(label, key, values):
-        chips = [f'<button class="chip" type="button" data-filter="{key}" '
-                 f'data-value="all" aria-pressed="true">All</button>']
-        for v in values:
-            short = v.replace(" Theatre", "") if key == "room" else v
-            chips.append(f'<button class="chip" type="button" data-filter="{key}" '
-                         f'data-value="{e(v)}" aria-pressed="false">{e(short)}</button>')
-        return (f'<div class="fgroup"><span class="flabel">{label}</span>'
-                f'<div class="chips">{"".join(chips)}</div></div>')
+    def group(label, key, values, all_label):
+        opts = [f'<option value="all">{all_label}</option>']
+        opts += [f'<option value="{e(v)}">{e(v)}</option>' for v in values]
+        return (f'<div class="fgroup">'
+                f'<label class="flabel" for="f-{key}">{label}</label>'
+                f'<div class="fselect"><select id="f-{key}" data-filter="{key}">'
+                f'{"".join(opts)}</select></div></div>')
 
     return ('<div class="filters">'
-            + group("Theatre", "room", ALL_ROOMS)
-            + group("Time", "time", ALL_TIMES)
-            + group("Topic", "topic", ALL_TOPICS)
+            + group("Theatre", "room", ALL_ROOMS, "All theatres")
+            + group("Time", "time", ALL_TIMES, "Any time")
+            + group("Topic", "topic", ALL_TOPICS, "All topics")
             + '</div>'
             '<div class="fresult"><span id="fcount"></span>'
             '<button class="fclear" id="fclear" type="button" hidden>Clear filters</button>'
@@ -817,11 +865,8 @@ def render_sessions():
         if any(BY_SLUG[slug].get("international") for slug, _ in s["speakers"]):
             badges.append('<span class="badge intl">International Speaker</span>')
 
-        who = ""
-        if s["speakers"]:
-            word = "Speakers" if len(s["speakers"]) > 1 else "Speaker"
-            who = (f'<p class="who"><span class="lbl">{word}:</span> '
-                   f'{speaker_links(s["speakers"])}</p>')
+        who = (f'<p class="who">{speaker_links(s["speakers"])}</p>'
+               if s["speakers"] else "")
 
         cards.append(
             f'<article class="session" id="{s["anchor"]}" tabindex="-1" '
@@ -848,9 +893,7 @@ def session_lines(slug):
                    f'<br><span class="note">{e(s["time"])} &middot; {e(s["room"])}</span>')
     if not out:
         return ""
-    label = "Speaking in" if len(out) == 1 else "Speaking in"
-    return (f'<p class="in-session"><span class="lbl">{label}</span>'
-            + "<br>".join(out) + '</p>')
+    return '<p class="in-session">' + "<br>".join(out) + '</p>'   
 
 
 def render_speakers():
@@ -910,10 +953,20 @@ def render_info():
             parts.append(f'<p>{b["html"]}</p>')
         if b.get("hashtag"):
             parts.append(f'<p class="hashtag">{e(b["hashtag"])}</p>')
-        if b.get("link"):
+        if b.get("email"):
+            # href is filled in by JS from two halves, so the plain address is
+            # not sitting in the source for scrapers to harvest.
             parts.append(
-                f'<a class="info-link" href="{e(b["link"]["url"])}" target="_blank" '
-                f'rel="noopener">{e(b["link"]["label"])} {EXT_SVG}</a>')
+                f'<a class="info-link" id="email-link" href="#" '
+                f'data-u="{e(D.CONTACT_EMAIL_USER)}" data-h="{e(D.CONTACT_EMAIL_HOST)}">'
+                f'Email us</a>'
+                f'<noscript><p>{e(D.CONTACT_EMAIL_USER)} at '
+                f'{e(D.CONTACT_EMAIL_HOST)}</p></noscript>')
+        if b.get("links"):
+            parts.append('<div class="info-links">' + "".join(
+                f'<a class="info-link" href="{e(l["url"])}" target="_blank" '
+                f'rel="noopener">{e(l["label"])} {EXT_SVG}</a>'
+                for l in b["links"]) + '</div>')
         blocks.append(f'<section class="info-card"><h3>{e(b["heading"])}</h3>'
                       + "".join(parts) + '</section>')
 
@@ -983,6 +1036,17 @@ def render_page():
     desc = (f"{ev['name']} — {ev['date']}, {ev['venue']}. "
             "Full programme, sessions and speakers.")
 
+    # The hero is a CSS background, so it is discovered late. Preloading the size
+    # that will actually be used keeps it as a fast LCP element.
+    preload = ""
+    if ev.get("hero"):
+        h = ev["hero"]
+        preload = (
+            f'<link rel="preload" as="image" href="images/hero/{h}-900.jpg"'
+            f' media="(max-width: 899px)">\n'
+            f'<link rel="preload" as="image" href="images/hero/{h}-1800.jpg"'
+            f' media="(min-width: 900px)">')
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -999,6 +1063,7 @@ def render_page():
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="images/logo.png">
 <link rel="apple-touch-icon" href="images/logo.png">
+{preload}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet"
@@ -1017,7 +1082,14 @@ def render_page():
 {render_sponsors()}
 </main>
 <footer class="wrap">
+  <p class="foot-cta">
+    <a href="{e(ev['tickets_url'])}" target="_blank" rel="noopener">
+      Get Your Tickets {EXT_SVG}</a>
+  </p>
   <p><b>{e(ev['name'])}</b> &middot; {e(ev['date'])} &middot; {e(ev['venue'])}</p>
+  <p class="credit">Event photography by
+    <a href="{e(D.PHOTO_CREDIT['url'])}" target="_blank" rel="noopener">
+      {e(D.PHOTO_CREDIT['name'])}</a></p>
   <p class="credit">Tool made using AI vibe-coding by
     <a href="https://shawnlife.com" target="_blank" rel="noopener">ShawnLife</a></p>
 </footer>

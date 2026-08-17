@@ -15,6 +15,7 @@ from pathlib import Path
 BUILD = Path(__file__).parent / "build"
 STEPS = [("build_images.py", "Images"),
          ("build_fonts.py", "Fonts"),
+         ("make_social.py", "Social card"),
          ("build_site.py", "Page")]
 
 

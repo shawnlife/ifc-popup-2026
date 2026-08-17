@@ -1174,8 +1174,14 @@ def render_page():
 <meta property="og:title" content="{e(ev['name'])}">
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{SITE_URL}">
-<meta property="og:image" content="{SITE_URL}assets/images/{e(ev['logo']['file'])}">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="{SITE_URL}assets/images/social-card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="{e(ev['name'])} — {e(ev['date'])}">
+<meta property="og:site_name" content="{e(ev['name'])}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{SITE_URL}assets/images/social-card.jpg">
 <link rel="icon" href="assets/images/logo.png">
 <link rel="apple-touch-icon" href="assets/images/logo.png">
 {preload}

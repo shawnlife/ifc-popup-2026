@@ -213,13 +213,26 @@ a.title:hover{color:var(--orange);text-decoration:none}
 /* Non-breaking space binds the chevron to the last word, so it can never
    wrap onto a line by itself. */
 a.title::after{content:'\\00A0\\203A';color:var(--orange);font-weight:700}
-.card .who{font-size:.87rem;color:var(--text);margin:0;line-height:1.5}
+.card .who{font-size:.87rem;color:var(--text);margin:0;line-height:1.6}
 .card .who a{color:var(--text);text-decoration:underline;
   text-decoration-color:rgba(255,255,255,.4);text-underline-offset:2px}
 .card .who a:hover{color:var(--orange);text-decoration-color:var(--orange)}
 .card .who .note{color:var(--text)}
 .card .detail{font-size:.87rem;color:var(--text);margin:0}
 .card .topics{margin-top:8px}
+
+/* Speaker headshot inline with their name — a name alone means nothing to
+   someone who has never met them; a face at least makes them a person before
+   the reader has tapped through. Shared by the Schedule and Sessions tabs.
+   inline-flex so each name+photo wraps together as one unit, never splitting
+   the avatar from its name mid-line. */
+.who-link{display:inline-flex;align-items:center;gap:6px;vertical-align:-6px}
+.who-avatar{
+  width:20px;height:20px;border-radius:50%;object-fit:cover;flex:0 0 auto;
+  border:1px solid rgba(255,255,255,.28);background:var(--surface-2);
+}
+.session .who-link{vertical-align:-7px}
+.session .who-avatar{width:24px;height:24px}
 
 /* ---------- badges ---------- */
 .badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
@@ -851,12 +864,17 @@ EXT_SVG = ('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path 
 # ---------------------------------------------------------------------------
 
 def speaker_links(pairs):
+    """Renders speaker names as links, each with a small circular headshot —
+    used on both the Schedule and Sessions tabs, so a name is never just text
+    with no face attached to it."""
     out = []
     for slug, note in pairs:
         if slug not in BY_SLUG:
             sys.exit(f"Unknown speaker slug in a session: {slug!r}")
         sp = BY_SLUG[slug]
-        bit = f'<a href="#{sp["slug"]}">{e(sp["name"])}</a>'
+        avatar = (f'<img class="who-avatar" src="assets/images/headshots/{sp["slug"]}.jpg" '
+                 f'width="24" height="24" loading="lazy" decoding="async" alt="">')
+        bit = f'<a class="who-link" href="#{sp["slug"]}">{avatar}{e(sp["name"])}</a>'
         if note:
             bit += f' <span class="note">({e(note)})</span>'
         out.append(bit)

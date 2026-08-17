@@ -53,6 +53,8 @@ fills the circle. Originals are never modified.
 | `build_site.py` | Builds `index.html`. Holds the CSS and JS. |
 | `build_images.py` | Resizes and re-frames photos into `images/`. |
 | `images/` | Web-ready logo, headshots, sponsor logos. |
+| `make_qr.py` | Builds the QR code + printable A5 card in `qr/`. |
+| `qr/` | QR code (PNG + SVG) and a print-ready A5 card for the info desk. |
 | `Headshots/`, `*.webp` | Originals. Not committed — local only. |
 
 ## Notes
@@ -67,8 +69,20 @@ fills the circle. Originals are never modified.
 - Font is Inter (Graphik is commercial and unavailable); the CSS asks for
   Graphik first, so licensed webfont files would drop straight in.
 
+## The QR code for the day
+
+`qr/ifc-popup-2026-qr-print-A5.png` is print-ready at A5, 300dpi. Both files were
+decoded back to the live URL to confirm they scan.
+
+**If the site moves to a custom domain, regenerate and reprint:**
+
+```bash
+python3 make_qr.py https://ifc.shawnlife.com/
+```
+
 ### Still outstanding
 
 - Nomsa Muthaphuli's bio
 - A higher-resolution Fundraising Beyond Borders logo (current is 200×50px)
-- Custom domain (`ifc.shawnlife.com`) — needs a DNS record plus a `CNAME` file
+- Custom domain (`ifc.shawnlife.com`) — needs a DNS record plus a `CNAME` file,
+  and a reprinted QR code

@@ -64,8 +64,19 @@ fills the circle. Originals are never modified.
 - Three tabs (Schedule / Sessions / Speakers). Only one shows at a time. Links
   between them switch tabs and jump to the right card, with a "back" pill to
   return. Without JavaScript it degrades to one long readable page.
-- Sponsor logos sit on white tiles because several are dark-on-transparent and
-  would vanish on the navy background.
+- Tapping a speaker's name anywhere opens their profile in a pop-up: big
+  headshot, bio, which session they're in, LinkedIn. Without JavaScript the same
+  content simply shows inline on the card instead.
+- The Sessions tab filters by theatre, time and topic. Topic tags live in
+  `TOPICS` in `site_data.py` — the filter chips are generated from whatever is
+  in there, so renaming or re-tagging needs no other change.
+- Sponsor logos sit on one pale band rather than individual white tiles.
+  Something light is needed behind them: Weaver, Downes Murray, CCA and Matogen
+  are all dark-on-transparent and vanish on the navy background.
+- Headshot framing is computed by face detection (`build_images.py`), not a
+  fixed crop rule, because the sources range from tight selfies to full-body
+  shots. Photos framed too tightly for a square get their edge pixels extended
+  rather than the head clipped.
 - Font is Inter (Graphik is commercial and unavailable); the CSS asks for
   Graphik first, so licensed webfont files would drop straight in.
 

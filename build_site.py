@@ -26,9 +26,33 @@ SITE_URL = "https://shawnlife.github.io/ifc-popup-2026/"
 BY_SLUG = {s["slug"]: s for s in D.SPEAKERS}
 BY_ANCHOR = {s["anchor"]: s for s in D.SESSIONS}
 
+# Which session(s) each speaker appears in.
+SESSIONS_FOR = {sp["slug"]: [] for sp in D.SPEAKERS}
+for _s in D.SESSIONS:
+    for _slug, _note in _s["speakers"]:
+        SESSIONS_FOR.setdefault(_slug, []).append(_s)
+
 
 def e(text):
     return html.escape(str(text), quote=True)
+
+
+def topics_of(anchor):
+    return D.TOPICS.get(anchor, [])
+
+
+ALL_TOPICS = sorted({t for a in BY_ANCHOR for t in topics_of(a)})
+
+
+def start_minutes(slot):
+    """Sort key for a "9:15 – 10:00" label. The day runs 08:00–17:00, so the
+    bare hour needs no am/pm handling."""
+    h, m = slot.split("–")[0].strip().split(":")
+    return int(h) * 60 + int(m)
+
+
+ALL_TIMES = sorted({s["time"] for s in D.SESSIONS}, key=start_minutes)
+ALL_ROOMS = [D.STAR, D.AVALON]
 
 
 # ---------------------------------------------------------------------------
@@ -40,23 +64,23 @@ CSS = """
 [hidden]{display:none !important}
 :root{
   --orange:#F49404;
-  --orange-dim:#c4760a;
   --bg:#303249;
   --surface:#3D3F5A;
-  --surface-2:#454764;
-  --muted:#A0A3C0;
-  --line:rgba(255,255,255,.08);
-  --line-strong:rgba(255,255,255,.16);
+  --surface-2:#474A69;
+  --text:#FFFFFF;
+  --muted:#CDD0E4;
+  --line:rgba(255,255,255,.10);
+  --line-strong:rgba(255,255,255,.20);
   --radius:12px;
-  --nav-h:56px;
+  --nav-h:58px;
   --wrap:1080px;
 }
-@media (min-width:760px){:root{--nav-h:66px}}
+@media (min-width:760px){:root{--nav-h:64px}}
 html{-webkit-text-size-adjust:100%}
 html:focus-within{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto}}
 body{
-  margin:0;background:var(--bg);color:#fff;
+  margin:0;background:var(--bg);color:var(--text);
   font-family:'Graphik','Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   font-size:16px;line-height:1.55;
   overflow-x:hidden;
@@ -69,53 +93,50 @@ a:hover{text-decoration:underline}
 .wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 16px}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
   clip:rect(0 0 0 0);white-space:nowrap;border:0}
-.skip{position:absolute;left:8px;top:-60px;z-index:60;background:var(--orange);
+.skip{position:absolute;left:8px;top:-60px;z-index:80;background:var(--orange);
   color:#241f10;font-weight:700;padding:10px 14px;border-radius:8px;transition:top .15s}
 .skip:focus{top:8px}
 
-/* ---------- sticky header ---------- */
+/* All headings set in caps. */
+h1,h2,h3{text-transform:uppercase;letter-spacing:.01em;font-weight:700}
+
+/* ---------- sticky header: centred tabs, no logo ---------- */
 header{
-  position:sticky;top:0;z-index:50;background:rgba(48,50,73,.96);
+  position:sticky;top:0;z-index:60;background:rgba(48,50,73,.97);
   backdrop-filter:saturate(1.4) blur(8px);
   border-bottom:1px solid var(--line);
 }
-.bar{display:flex;align-items:center;gap:10px;height:var(--nav-h);
-  max-width:var(--wrap);margin:0 auto;padding:0 12px}
-.bar .mark{flex:0 0 auto;display:flex;align-items:center}
-.bar .mark img{height:38px;width:auto;display:block}
-@media (min-width:760px){.bar{gap:18px;padding:0 16px}.bar .mark img{height:50px}}
-[role=tablist]{display:flex;flex:1 1 auto;gap:4px;justify-content:flex-end;min-width:0}
+.bar{display:flex;align-items:center;height:var(--nav-h);
+  max-width:var(--wrap);margin:0 auto;padding:0 10px}
+[role=tablist]{display:flex;flex:1 1 auto;gap:6px;justify-content:center;min-width:0}
 [role=tab]{
-  flex:1 1 0;min-width:0;min-height:44px;
+  flex:1 1 0;min-width:0;max-width:190px;min-height:44px;
   display:flex;align-items:center;justify-content:center;
-  padding:0 6px;border-radius:9px;
-  font-size:.83rem;font-weight:600;letter-spacing:.01em;
+  padding:0 8px;border-radius:9px;
+  font-size:.84rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
   color:var(--muted);text-decoration:none;white-space:nowrap;
-  border:1px solid transparent;background:none;cursor:pointer;
-  font-family:inherit;
+  border:1px solid transparent;background:none;cursor:pointer;font-family:inherit;
 }
-@media (min-width:760px){[role=tab]{flex:0 0 auto;font-size:.95rem;padding:0 18px}}
-[role=tab]:hover{color:#fff;text-decoration:none;background:rgba(255,255,255,.05)}
-[role=tab][aria-selected=true]{
-  color:#241f10;background:var(--orange);border-color:var(--orange);
-}
+@media (min-width:760px){[role=tab]{font-size:.9rem;padding:0 26px}}
+[role=tab]:hover{color:#fff;text-decoration:none;background:rgba(255,255,255,.06)}
+[role=tab][aria-selected=true]{color:#241f10;background:var(--orange);border-color:var(--orange)}
 
 /* ---------- panels ---------- */
 [role=tabpanel]{padding:22px 0 8px;scroll-margin-top:calc(var(--nav-h) + 8px)}
-.panel-head{margin:0 0 4px;font-size:1.5rem;line-height:1.2;letter-spacing:-.01em}
+.panel-head{margin:0 0 4px;font-size:1.4rem;line-height:1.2}
 .panel-sub{margin:0 0 20px;color:var(--muted);font-size:.92rem}
 
 /* ---------- hero ---------- */
-.hero{text-align:center;padding:14px 0 26px}
+.hero{text-align:center;padding:14px 0 28px}
 .hero img{width:min(260px,68vw);height:auto;margin:0 auto 18px;display:block}
-.hero h1{margin:0 0 10px;font-size:clamp(1.5rem,6vw,2.5rem);line-height:1.15;
-  letter-spacing:-.02em;font-weight:700}
-.hero .meta{margin:0 auto 20px;color:var(--muted);font-size:.98rem;max-width:34ch}
-.hero .meta b{color:#fff;font-weight:600}
+.hero h1{margin:0 0 12px;font-size:clamp(1.35rem,5.4vw,2.3rem);line-height:1.18}
+.hero .meta{margin:0 auto 22px;color:var(--text);font-size:1rem;max-width:34ch}
+.hero .meta b{display:block;font-size:1.1rem;letter-spacing:.02em}
+.hero .meta span{color:var(--muted)}
 .cta{
-  display:inline-flex;align-items:center;gap:8px;min-height:50px;
-  padding:0 26px;border-radius:999px;
-  background:var(--orange);color:#241f10;font-weight:700;font-size:1.02rem;
+  display:inline-flex;align-items:center;gap:8px;min-height:50px;padding:0 26px;
+  border-radius:999px;background:var(--orange);color:#241f10;
+  font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:.04em;
 }
 .cta:hover{background:#ffa61f;text-decoration:none}
 .cta svg{width:15px;height:15px;fill:currentColor;flex:0 0 auto}
@@ -125,12 +146,8 @@ header{
   display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px;
   padding:12px 0;border-top:1px solid var(--line);
 }
-.slot:nth-child(odd){background:rgba(255,255,255,.018)}
 @media (min-width:760px){.slot{grid-template-columns:104px minmax(0,1fr);gap:18px;padding:14px 0}}
-.slot-time{
-  font-weight:700;font-size:.76rem;color:var(--orange);line-height:1.35;
-  padding-top:11px;letter-spacing:.005em;
-}
+.slot-time{font-weight:700;font-size:.78rem;color:var(--orange);line-height:1.35;padding-top:11px}
 @media (min-width:760px){.slot-time{font-size:.9rem}}
 .rooms{display:grid;gap:10px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:760px){.rooms{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
@@ -138,50 +155,74 @@ header{
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   padding:12px 14px;min-width:0;
 }
-.card.star{border-left:3px solid var(--orange)}
-.card.avalon{border-left:3px solid rgba(255,255,255,.34)}
-.card.plenary{
-  border:1px solid rgba(244,148,4,.42);border-left:3px solid var(--orange);
-  background:linear-gradient(180deg,rgba(244,148,4,.10),rgba(244,148,4,.03)),var(--surface);
-}
-.card.break,.card.logistics{
-  background:transparent;border:1px dashed var(--line-strong);border-left:1px dashed var(--line-strong);
-}
-.card.remarks{background:rgba(255,255,255,.03);border-left:3px solid rgba(255,255,255,.2)}
-.room{
-  font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;
-  color:var(--muted);display:block;margin-bottom:5px;
-}
-.card.star .room{color:var(--orange)}
-.kicker{
-  font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;
+.card.star,.card.plenary{border-left:3px solid var(--orange)}
+.card.avalon{border-left:3px solid var(--orange)}
+.card.break,.card.logistics,.card.remarks{border-left:3px solid var(--line-strong)}
+/* Room and section labels are always orange. */
+.room,.kicker{
+  font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;
   color:var(--orange);display:block;margin-bottom:5px;
 }
-.card .title{
-  display:block;font-weight:600;font-size:.97rem;line-height:1.35;color:#fff;
-  margin:0 0 6px;
-}
+.card .title{display:block;font-weight:600;font-size:.97rem;line-height:1.35;
+  color:var(--text);margin:0 0 6px}
 a.title:hover{color:var(--orange);text-decoration:none}
 a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
-.card.break .title,.card.logistics .title{font-size:.92rem;color:var(--muted)}
-.card .who{font-size:.86rem;color:var(--muted);margin:0;line-height:1.5}
-.card .who a{color:#cfd2e8;text-decoration:underline;text-decoration-color:rgba(207,210,232,.35);
-  text-underline-offset:2px}
+.card .who{font-size:.87rem;color:var(--text);margin:0;line-height:1.5}
+.card .who a{color:var(--text);text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,.4);text-underline-offset:2px}
 .card .who a:hover{color:var(--orange);text-decoration-color:var(--orange)}
-.card .detail{font-size:.86rem;color:var(--muted);margin:0}
+.card .who .note{color:var(--muted)}
+.card .detail{font-size:.87rem;color:var(--text);margin:0}
+.card .topics{margin-top:8px}
 
 /* ---------- badges ---------- */
-.badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
 .badge{
   font-size:.64rem;text-transform:uppercase;letter-spacing:.09em;font-weight:700;
   padding:4px 9px;border-radius:999px;border:1px solid var(--line-strong);
   color:var(--muted);white-space:nowrap;
 }
-.badge.star{color:var(--orange);border-color:rgba(244,148,4,.45);background:rgba(244,148,4,.08)}
-.badge.avalon{color:#d3d6ec;border-color:var(--line-strong)}
+.badge.room-b{color:var(--orange);border-color:rgba(244,148,4,.5);background:rgba(244,148,4,.09)}
 .badge.plenary{color:#241f10;background:var(--orange);border-color:var(--orange)}
-.badge.intl{color:#9fe3c4;border-color:rgba(159,227,196,.4);background:rgba(159,227,196,.08)}
-.badge.time{color:#fff;border-color:var(--line-strong);letter-spacing:.04em}
+.badge.panel{color:#ffd9a0;border-color:rgba(244,148,4,.45)}
+.badge.intl{color:#9fe3c4;border-color:rgba(159,227,196,.45);background:rgba(159,227,196,.09)}
+.badge.time{color:var(--text);border-color:var(--line-strong);letter-spacing:.04em}
+.badge.topic{color:#c9d8ff;border-color:rgba(201,216,255,.35);background:rgba(201,216,255,.07)}
+
+/* ---------- filters ---------- */
+.filters{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px;margin:0 0 18px;
+}
+.fgroup{display:flex;align-items:center;gap:8px;padding:5px 0;min-width:0}
+.fgroup + .fgroup{border-top:1px solid var(--line);margin-top:5px;padding-top:10px}
+.flabel{
+  flex:0 0 62px;font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;
+  font-weight:700;color:var(--orange);
+}
+@media (min-width:760px){.flabel{flex-basis:76px}}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0;scrollbar-width:none;flex:1 1 auto}
+.chips::-webkit-scrollbar{display:none}
+@media (min-width:760px){.chips{flex-wrap:wrap;overflow:visible}}
+.chip{
+  flex:0 0 auto;min-height:38px;padding:0 13px;border-radius:999px;
+  border:1px solid var(--line-strong);background:none;color:var(--muted);
+  font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;
+}
+.chip:hover{color:#fff;border-color:var(--muted)}
+.chip[aria-pressed=true]{background:var(--orange);border-color:var(--orange);color:#241f10}
+.fresult{display:flex;align-items:center;gap:12px;margin:0 0 16px;
+  font-size:.85rem;color:var(--muted)}
+.fclear{
+  background:none;border:1px solid var(--line-strong);color:var(--muted);
+  font-family:inherit;font-size:.75rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;padding:7px 12px;border-radius:999px;cursor:pointer;min-height:36px;
+}
+.fclear:hover{color:#fff;border-color:#fff}
+.empty{
+  background:var(--surface);border:1px dashed var(--line-strong);
+  border-radius:var(--radius);padding:28px;text-align:center;color:var(--muted);
+}
 
 /* ---------- session cards ---------- */
 .sessions{display:grid;gap:14px}
@@ -190,20 +231,15 @@ a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
   padding:16px;scroll-margin-top:calc(var(--nav-h) + 14px);
 }
 @media (min-width:760px){.session{padding:22px 24px}}
-.session.is-plenary{
-  border-color:rgba(244,148,4,.42);
-  background:linear-gradient(180deg,rgba(244,148,4,.09),rgba(244,148,4,.02)),var(--surface);
-}
-.session h3{
-  margin:0 0 10px;color:var(--orange);font-size:1.1rem;line-height:1.3;
-  letter-spacing:-.005em;
-}
-@media (min-width:760px){.session h3{font-size:1.28rem}}
-.session .who{font-size:.92rem;color:var(--muted);margin:0 0 12px}
-.session .who a{color:#fff;font-weight:600;text-decoration:underline;
-  text-decoration-color:rgba(255,255,255,.3);text-underline-offset:2px}
+.session h3{margin:0 0 10px;color:var(--orange);font-size:1.05rem;line-height:1.3}
+@media (min-width:760px){.session h3{font-size:1.2rem}}
+.session .who{font-size:.92rem;color:var(--text);margin:0 0 12px}
+.session .who .lbl{color:var(--muted)}
+.session .who a{color:var(--text);font-weight:600;text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,.4);text-underline-offset:2px}
 .session .who a:hover{color:var(--orange);text-decoration-color:var(--orange)}
-.session p.desc{margin:0;color:#e6e8f5;font-size:.95rem}
+.session .who .note{color:var(--muted);font-weight:400}
+.session p.desc{margin:0;color:var(--text);font-size:.95rem}
 
 /* ---------- speakers ---------- */
 .speakers{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
@@ -215,39 +251,79 @@ a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
   scroll-margin-top:calc(var(--nav-h) + 14px);
 }
 .spk img{
-  width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:50% 25%;
-  border:2px solid rgba(255,255,255,.14);background:var(--surface-2);margin-bottom:14px;
+  width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:50% 50%;
+  border:2px solid rgba(255,255,255,.16);background:var(--surface-2);margin-bottom:14px;
 }
-.spk h3{margin:0 0 4px;font-size:1.04rem;line-height:1.3}
+.spk h3{margin:0 0 5px;font-size:1rem;line-height:1.3}
 .spk .role{margin:0;color:var(--muted);font-size:.85rem;line-height:1.45}
-.spk .org{margin:0;color:var(--muted);font-size:.85rem;font-weight:600;line-height:1.45}
-/* Badge sits below the org so name/title/org stay aligned across a row. */
-.spk .spk-badges{display:flex;gap:6px;justify-content:center;margin:8px 0 0}
+.spk .org{margin:0;color:var(--text);font-size:.85rem;font-weight:600;line-height:1.45}
+.spk .in-session{margin:10px 0 0;font-size:.8rem;line-height:1.4}
+.spk .in-session .lbl{display:block;color:var(--orange);font-size:.62rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.spk .in-session a{color:var(--text);text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,.35);text-underline-offset:2px}
+.spk .in-session a:hover{color:var(--orange);text-decoration-color:var(--orange)}
 .spk .pending-note{margin:8px 0 0;color:var(--muted);font-size:.8rem;font-style:italic}
-.actions{
-  margin-top:auto;padding-top:14px;display:flex;gap:8px;
-  justify-content:center;flex-wrap:wrap;width:100%;
+.actions{margin-top:auto;padding-top:16px;display:flex;gap:8px;
+  justify-content:center;flex-wrap:wrap;width:100%}
+.learn-btn{
+  background:none;border:1px solid var(--line-strong);color:var(--muted);
+  font-family:inherit;font-size:.75rem;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;padding:9px 15px;border-radius:999px;cursor:pointer;min-height:44px;
 }
-.bio-btn{
-  margin:0;background:none;border:1px solid var(--line-strong);color:var(--muted);
-  font-family:inherit;font-size:.78rem;font-weight:600;letter-spacing:.04em;
-  text-transform:uppercase;padding:9px 14px;border-radius:999px;cursor:pointer;
-  min-height:44px;
-}
-.bio-btn:hover{color:#fff;border-color:var(--muted)}
-.bio-btn[aria-expanded=true]{color:var(--orange);border-color:rgba(244,148,4,.45)}
-.bio{
-  margin:14px 0 0;font-size:.88rem;color:#e6e8f5;text-align:left;
-  border-top:1px solid var(--line);padding-top:12px;width:100%;
-}
+.learn-btn:hover{color:var(--orange);border-color:rgba(244,148,4,.5)}
 .li{
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  min-height:44px;padding:0 16px;border-radius:999px;
-  border:1px solid var(--line-strong);color:var(--muted);
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;
+  padding:0 16px;border-radius:999px;border:1px solid var(--line-strong);color:var(--muted);
   font-size:.78rem;font-weight:600;
 }
 .li:hover{color:#fff;border-color:#0A66C2;background:#0A66C2;text-decoration:none}
 .li svg{width:14px;height:14px;fill:currentColor}
+
+/* Inline detail is the no-JS fallback; with JS it moves into the modal. */
+.spk-detail{margin:14px 0 0;text-align:left;border-top:1px solid var(--line);
+  padding-top:12px;width:100%}
+html.js .spk-detail{display:none}
+html:not(.js) .learn-btn{display:none}
+.spk-detail .bio{margin:0;font-size:.88rem;color:var(--text)}
+
+/* ---------- speaker modal ---------- */
+.modal{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;
+  justify-content:center;padding:0}
+@media (min-width:640px){.modal{align-items:center;padding:24px}}
+.modal-backdrop{position:absolute;inset:0;background:rgba(16,17,26,.72);
+  backdrop-filter:blur(3px)}
+.modal-card{
+  position:relative;background:var(--surface);border:1px solid var(--line-strong);
+  border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:92vh;
+  overflow-y:auto;padding:26px 20px 24px;text-align:center;
+  -webkit-overflow-scrolling:touch;
+}
+@media (min-width:640px){.modal-card{border-radius:16px;padding:30px 32px 28px;max-height:86vh}}
+.modal-x{
+  position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--line-strong);background:rgba(0,0,0,.25);color:#fff;
+  font-size:1.35rem;line-height:1;cursor:pointer;font-family:inherit;
+}
+.modal-x:hover{background:var(--orange);color:#241f10;border-color:var(--orange)}
+#modal-img{width:150px;height:150px;border-radius:50%;object-fit:cover;
+  border:3px solid rgba(255,255,255,.18);margin:4px auto 16px;display:block}
+#modal-name{margin:0 0 6px;font-size:1.2rem;line-height:1.25}
+#modal-role{margin:0;color:var(--muted);font-size:.9rem}
+#modal-org{margin:0 0 4px;color:var(--text);font-size:.9rem;font-weight:600}
+#modal-badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0 0}
+#modal-badges:empty{display:none}
+#modal-body{text-align:left;margin-top:18px}
+#modal-body .bio{margin:0;font-size:.92rem;color:var(--text);line-height:1.6}
+#modal-body .in-session{margin:0 0 16px;padding:12px 14px;background:rgba(0,0,0,.16);
+  border-left:3px solid var(--orange);border-radius:8px;font-size:.88rem}
+#modal-body .in-session .lbl{display:block;color:var(--orange);font-size:.62rem;
+  font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+#modal-body .in-session a{color:var(--text);font-weight:600;text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,.4);text-underline-offset:2px}
+#modal-body .in-session a:hover{color:var(--orange);text-decoration-color:var(--orange)}
+.modal-foot{margin-top:20px}
+html.modal-open,html.modal-open body{overflow:hidden}
 
 /* ---------- pulse on deep-link arrival ---------- */
 @keyframes pulse{
@@ -260,44 +336,48 @@ a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
 
 /* ---------- back pill ---------- */
 #backpill{
-  position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:55;
+  position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:70;
   display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 20px;
   border-radius:999px;border:1px solid rgba(0,0,0,.2);
   background:var(--orange);color:#241f10;font-family:inherit;font-weight:700;
-  font-size:.9rem;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  font-size:.88rem;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  text-transform:uppercase;letter-spacing:.04em;
 }
 #backpill:hover{background:#ffa61f}
 
-/* ---------- sponsors + footer ---------- */
-.sponsors-wrap{border-top:1px solid var(--line);margin-top:34px;padding:34px 0 0}
-.sponsors-wrap h2{margin:0 0 6px;text-align:center;font-size:1.2rem;letter-spacing:-.01em}
-.sponsors-wrap p.note{margin:0 0 22px;text-align:center;color:var(--muted);font-size:.88rem}
-.sponsors{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;list-style:none;
-  margin:0;padding:0}
-.sponsors li{flex:1 1 calc(50% - 10px);max-width:230px;display:flex}
-@media (min-width:640px){.sponsors li{flex:0 1 200px}}
-.sponsors a{
-  flex:1;background:#fff;border-radius:10px;padding:14px 16px;min-height:84px;
-  display:flex;align-items:center;justify-content:center;
-}
-.sponsors a:hover{box-shadow:0 0 0 2px var(--orange);text-decoration:none}
-.sponsors img{max-width:100%;max-height:48px;width:auto;height:auto;display:block}
+/* ---------- sponsors: one pale band, not nine white tiles ---------- */
+.sponsors-wrap{margin-top:46px;padding:34px 0 38px;background:#EEEFF5;border-radius:16px}
+.sponsors-wrap h2{margin:0 0 24px;text-align:center;font-size:1.05rem;color:#303249}
+.sponsors{display:flex;flex-wrap:wrap;gap:26px 34px;justify-content:center;
+  align-items:center;list-style:none;margin:0;padding:0 24px}
+.sponsors li{display:flex;align-items:center;justify-content:center}
+.sponsors a{display:flex;align-items:center;justify-content:center;padding:4px;
+  border-radius:6px}
+.sponsors a:hover{outline:2px solid var(--orange);outline-offset:4px;text-decoration:none}
+.sponsors img{max-height:42px;max-width:150px;width:auto;height:auto;display:block}
+@media (min-width:760px){.sponsors img{max-height:50px;max-width:180px}}
+
 footer{
-  margin-top:34px;border-top:1px solid var(--line);padding:22px 0 30px;
-  text-align:center;color:var(--muted);font-size:.83rem;
+  border-top:1px solid var(--line);padding:26px 0 34px;
+  text-align:center;color:var(--muted);font-size:.84rem;
 }
-footer p{margin:0 0 6px}
-footer .credit{font-size:.78rem;opacity:.75}
+/* Needs to out-specify .wrap's "margin:0 auto", which would zero this out. */
+footer.wrap{margin-top:44px}
+footer p{margin:0 0 8px}
+footer .credit{font-size:.78rem;opacity:.8}
 footer .credit a{color:var(--muted);text-decoration:underline}
 footer .credit a:hover{color:var(--orange)}
 """
 
 # ---------------------------------------------------------------------------
-# JS — tab switching plus cross-tab deep linking
+# JS
 # ---------------------------------------------------------------------------
 
 JS = """
 (function(){
+  var root = document.documentElement;
+  root.classList.add('js');
+
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role=tab]'));
   if(!tabs.length) return;
   var panels = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
@@ -343,33 +423,88 @@ JS = """
     el.classList.add('pulse');
     setTimeout(function(){ el.classList.remove('pulse'); }, 1700);
   }
-  function clearHash(){
-    if(location.hash) history.replaceState(null, '', location.pathname + location.search);
-  }
 
-  // Without JS every panel stays visible, so the page still reads as one long
+  // Without JS every panel stays visible, so the page reads as one long
   // document. Now that JS is running, collapse it into real tabs.
   activate(panels[0].id);
 
-  function syncFromHash(){
-    var id = location.hash.replace(/^#/, '');
-    if(!id) return false;
-    var target = document.getElementById(id);
-    if(!target) return false;
+  /* ---------------- speaker modal ---------------- */
+  var modal = document.getElementById('modal');
+  var mImg = document.getElementById('modal-img');
+  var mName = document.getElementById('modal-name');
+  var mRole = document.getElementById('modal-role');
+  var mOrg = document.getElementById('modal-org');
+  var mBadges = document.getElementById('modal-badges');
+  var mBody = document.getElementById('modal-body');
+  var mLi = document.getElementById('modal-li');
+  var mClose = modal.querySelector('.modal-x');
+  var lastFocus = null;
+
+  function openModal(card){
+    var detail = card.querySelector('.spk-detail');
+    mImg.src = card.getAttribute('data-img');
+    mImg.alt = card.getAttribute('data-name');
+    mName.textContent = card.getAttribute('data-name');
+    mRole.textContent = card.getAttribute('data-role');
+    mOrg.textContent = card.getAttribute('data-org');
+    mBadges.innerHTML = card.getAttribute('data-intl') === '1'
+      ? '<span class="badge intl">International Speaker</span>' : '';
+    mBody.innerHTML = detail ? detail.innerHTML : '';
+    mLi.href = card.getAttribute('data-linkedin');
+    lastFocus = document.activeElement;
+    modal.hidden = false;
+    root.classList.add('modal-open');
+    mClose.focus();
+  }
+  function closeModal(){
+    if(modal.hidden) return;
+    modal.hidden = true;
+    root.classList.remove('modal-open');
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+    lastFocus = null;
+  }
+  function modalOpen(){ return !modal.hidden; }
+
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(!t || !t.closest) return;
+    var btn = t.closest('.learn-btn');
+    if(btn){ openModal(btn.closest('.spk')); return; }
+    if(t.closest('[data-close]')){ ev.preventDefault(); closeModal(); }
+  });
+  document.addEventListener('keydown', function(ev){
+    if(!modalOpen()) return;
+    if(ev.key === 'Escape'){ ev.preventDefault(); closeModal(); return; }
+    if(ev.key !== 'Tab') return;
+    // Keep focus inside the dialog.
+    var f = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    f = Array.prototype.filter.call(f, function(el){ return el.offsetParent !== null; });
+    if(!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if(ev.shiftKey && document.activeElement === first){ ev.preventDefault(); last.focus(); }
+    else if(!ev.shiftKey && document.activeElement === last){ ev.preventDefault(); first.focus(); }
+  });
+
+  /* ---------------- navigation ---------------- */
+  function goTo(target, withModal){
     var p = panelOf(target);
-    if(!p) return false;
+    if(!p) return;
     if(p !== currentPanel()) activate(p.id);
-    target.scrollIntoView({ block:'start' });
-    pulse(target);
-    return true;
+    target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'start' });
+    if(withModal && target.classList.contains('spk')){
+      setTimeout(function(){ openModal(target); }, reduce ? 0 : 260);
+    } else {
+      pulse(target);
+    }
   }
 
   tabs.forEach(function(tab, i){
     tab.addEventListener('click', function(ev){
       ev.preventDefault();
+      closeModal();
       activate(tab.getAttribute('aria-controls'));
       hidePill();
-      clearHash();
+      if(location.hash) history.replaceState(null, '', location.pathname + location.search);
       window.scrollTo(0, 0);
       tab.focus();
     });
@@ -385,7 +520,6 @@ JS = """
     });
   });
 
-  // Any in-page link: reveal the owning panel first, then jump to it.
   document.addEventListener('click', function(ev){
     var a = ev.target && ev.target.closest ? ev.target.closest('a[href^="#"]') : null;
     if(!a || a.getAttribute('role') === 'tab') return;
@@ -393,43 +527,89 @@ JS = """
     if(!id) return;
     var target = document.getElementById(id);
     if(!target) return;
-    var p = panelOf(target);
-    if(!p) return;
+    if(!panelOf(target)) return;
     ev.preventDefault();
+    var cameFromModal = !!a.closest('#modal');
+    if(cameFromModal) closeModal();
     var cur = currentPanel();
-    if(p !== cur) showPill(cur.id);
-    activate(p.id);
+    var dest = panelOf(target);
+    if(dest !== cur) showPill(cur.id);
     history.pushState(null, '', '#' + id);
-    target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'start' });
-    pulse(target);
+    // Tapping a speaker's name opens their profile, which is the point of the tap.
+    goTo(target, true);
   });
 
   pill.addEventListener('click', function(){
     if(!ret){ hidePill(); return; }
     var back = ret;
+    closeModal();
     activate(back.id);
     hidePill();
     history.pushState(null, '', location.pathname + location.search);
     window.scrollTo(0, back.y);
   });
 
+  function syncFromHash(){
+    var id = location.hash.replace(/^#/, '');
+    if(!id) return false;
+    var target = document.getElementById(id);
+    if(!target || !panelOf(target)) return false;
+    goTo(target, true);
+    return true;
+  }
   window.addEventListener('popstate', function(){
-    if(!syncFromHash()){ hidePill(); }
+    closeModal();
+    if(!syncFromHash()) hidePill();
   });
 
-  // Bios collapse by default; keeps the 3-up grid tidy and the phone scroll short.
+  /* ---------------- session filters ---------------- */
+  var state = { room:'all', time:'all', topic:'all' };
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.session'));
+  var countEl = document.getElementById('fcount');
+  var emptyEl = document.getElementById('fempty');
+  var clearBtn = document.getElementById('fclear');
+
+  function applyFilters(){
+    var shown = 0;
+    cards.forEach(function(c){
+      var okRoom = state.room === 'all' || c.getAttribute('data-room') === state.room;
+      var okTime = state.time === 'all' || c.getAttribute('data-time') === state.time;
+      var okTopic = state.topic === 'all' ||
+        ('|' + c.getAttribute('data-topics') + '|').indexOf('|' + state.topic + '|') > -1;
+      var on = okRoom && okTime && okTopic;
+      c.hidden = !on;
+      if(on) shown++;
+    });
+    countEl.textContent = shown === cards.length
+      ? cards.length + ' sessions'
+      : shown + ' of ' + cards.length + ' sessions';
+    emptyEl.hidden = shown > 0;
+    var active = state.room !== 'all' || state.time !== 'all' || state.topic !== 'all';
+    clearBtn.hidden = !active;
+  }
+
   document.addEventListener('click', function(ev){
-    var b = ev.target && ev.target.closest ? ev.target.closest('.bio-btn') : null;
-    if(!b) return;
-    var bio = document.getElementById(b.getAttribute('aria-controls'));
-    if(!bio) return;
-    var open = b.getAttribute('aria-expanded') === 'true';
-    b.setAttribute('aria-expanded', open ? 'false' : 'true');
-    b.textContent = open ? 'Read bio' : 'Hide bio';
-    bio.hidden = open;
+    var chip = ev.target && ev.target.closest ? ev.target.closest('.chip') : null;
+    if(chip){
+      var key = chip.getAttribute('data-filter');
+      state[key] = chip.getAttribute('data-value');
+      document.querySelectorAll('.chip[data-filter="' + key + '"]').forEach(function(c){
+        c.setAttribute('aria-pressed', c === chip ? 'true' : 'false');
+      });
+      applyFilters();
+      return;
+    }
+    if(ev.target.closest && ev.target.closest('#fclear')){
+      state = { room:'all', time:'all', topic:'all' };
+      document.querySelectorAll('.chip').forEach(function(c){
+        c.setAttribute('aria-pressed', c.getAttribute('data-value') === 'all' ? 'true' : 'false');
+      });
+      applyFilters();
+    }
   });
+  if(cards.length) applyFilters();
 
-  // Deep link straight from a QR code or a shared link.
+  /* ---------------- deep link from a QR or shared link ---------------- */
   if(location.hash) syncFromHash();
 })();
 """
@@ -448,11 +628,10 @@ EXT_SVG = ('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path 
 
 
 # ---------------------------------------------------------------------------
-# Rendering helpers
+# Rendering
 # ---------------------------------------------------------------------------
 
-def speaker_links(pairs, sep=", "):
-    """Render "Name (Moderator), Name, Name" with each name linked to its card."""
+def speaker_links(pairs):
     out = []
     for slug, note in pairs:
         if slug not in BY_SLUG:
@@ -463,8 +642,12 @@ def speaker_links(pairs, sep=", "):
             bit += f' <span class="note">({e(note)})</span>'
         out.append(bit)
     if len(out) > 1:
-        return sep.join(out[:-1]) + " &amp; " + out[-1]
+        return ", ".join(out[:-1]) + " &amp; " + out[-1]
     return out[0] if out else ""
+
+
+def topic_badges(anchor):
+    return "".join(f'<span class="badge topic">{e(t)}</span>' for t in topics_of(anchor))
 
 
 def render_schedule_item(item, room_class=None, room_label=None):
@@ -476,26 +659,20 @@ def render_schedule_item(item, room_class=None, room_label=None):
         s = BY_ANCHOR[item["session"]]
         if item.get("flavour") == "plenary" or s.get("plenary"):
             classes.append("plenary")
-        head = ""
-        if room_label:
-            head = f'<span class="room">{e(room_label)}</span>'
-        else:
-            head = f'<span class="kicker">{e(s["label"])} &middot; {e(s["room"])}</span>'
-        who = ""
-        if s["speakers"]:
-            who = f'<p class="who">{speaker_links(s["speakers"])}</p>'
-        label = e(s["label"]) + ": " if room_label else ""
+        # Full-width plenaries keep their "OPENING PLENARY · STAR THEATRE" kicker.
+        head = (f'<span class="room">{e(room_label)}</span>' if room_label
+                else f'<span class="kicker">{e(s["label"])} &middot; {e(s["room"])}</span>')
+        who = (f'<p class="who">{speaker_links(s["speakers"])}</p>'
+               if s["speakers"] else "")
         return (
             f'<div class="{" ".join(classes)}">{head}'
-            f'<a class="title" href="#{s["anchor"]}">{label}{e(s["title"])}</a>{who}</div>'
+            f'<a class="title" href="#{s["anchor"]}">{e(s["title"])}</a>{who}</div>'
         )
 
     classes.append(item["flavour"])
-    return (
-        f'<div class="{" ".join(classes)}">'
-        f'<span class="title">{e(item["name"])}</span>'
-        f'<p class="detail">{e(item["detail"])}</p></div>'
-    )
+    detail = (f'<p class="detail">{e(item["detail"])}</p>' if item.get("detail") else "")
+    return (f'<div class="{" ".join(classes)}">'
+            f'<span class="title">{e(item["name"])}</span>{detail}</div>')
 
 
 def render_schedule():
@@ -504,22 +681,22 @@ def render_schedule():
         if slot["kind"] == "full":
             body = render_schedule_item(slot["item"])
         else:
-            star = render_schedule_item(slot["star"], "star", D.STAR)
-            avalon = render_schedule_item(slot["avalon"], "avalon", D.AVALON)
-            body = f'<div class="rooms">{star}{avalon}</div>'
+            body = ('<div class="rooms">'
+                    + render_schedule_item(slot["star"], "star", D.STAR)
+                    + render_schedule_item(slot["avalon"], "avalon", D.AVALON)
+                    + '</div>')
         rows.append(
             f'<div class="slot"><div class="slot-time">{e(slot["time"])}</div>'
             f'<div class="slot-body">{body}</div></div>'
         )
 
-    ev = D.EVENT
-    logo = ev["logo"]
+    ev, logo = D.EVENT, D.EVENT["logo"]
     hero = f"""
     <div class="hero">
       <img src="images/{e(logo['file'])}" width="{logo['w']}" height="{logo['h']}"
            alt="IFC Cape Town Pop-Up 2026">
       <h1>{e(ev['headline'])}</h1>
-      <p class="meta"><b>{e(ev['date'])}</b><br>{e(ev['venue'])}</p>
+      <p class="meta"><b>{e(ev['date'])}</b><span>{e(ev['venue'])}</span></p>
       <a class="cta" href="{e(ev['tickets_url'])}" target="_blank" rel="noopener">
         Get Your Tickets {EXT_SVG}</a>
     </div>"""
@@ -531,89 +708,149 @@ def render_schedule():
             + '<div class="schedule">' + "".join(rows) + '</div>')
 
 
+def render_filters():
+    def group(label, key, values):
+        chips = [f'<button class="chip" type="button" data-filter="{key}" '
+                 f'data-value="all" aria-pressed="true">All</button>']
+        for v in values:
+            short = v.replace(" Theatre", "") if key == "room" else v
+            chips.append(f'<button class="chip" type="button" data-filter="{key}" '
+                         f'data-value="{e(v)}" aria-pressed="false">{e(short)}</button>')
+        return (f'<div class="fgroup"><span class="flabel">{label}</span>'
+                f'<div class="chips">{"".join(chips)}</div></div>')
+
+    return ('<div class="filters">'
+            + group("Theatre", "room", ALL_ROOMS)
+            + group("Time", "time", ALL_TIMES)
+            + group("Topic", "topic", ALL_TOPICS)
+            + '</div>'
+            '<div class="fresult"><span id="fcount"></span>'
+            '<button class="fclear" id="fclear" type="button" hidden>Clear filters</button>'
+            '</div>')
+
+
 def render_sessions():
     cards = []
     for s in D.SESSIONS:
-        badges = [f'<span class="badge time">{e(s["time"])}</span>']
-        room_cls = "star" if s["room"] == D.STAR else "avalon"
-        badges.append(f'<span class="badge {room_cls}">{e(s["room"])}</span>')
+        badges = [f'<span class="badge time">{e(s["time"])}</span>',
+                  f'<span class="badge room-b">{e(s["room"])}</span>']
         if s.get("plenary"):
             badges.append('<span class="badge plenary">Plenary</span>')
+        if s["anchor"] in D.PANELS:
+            badges.append('<span class="badge panel">Panel</span>')
+        badges.append(topic_badges(s["anchor"]))
         if any(BY_SLUG[slug].get("international") for slug, _ in s["speakers"]):
             badges.append('<span class="badge intl">International Speaker</span>')
 
         who = ""
         if s["speakers"]:
             word = "Speakers" if len(s["speakers"]) > 1 else "Speaker"
-            who = f'<p class="who">{word}: {speaker_links(s["speakers"])}</p>'
+            who = (f'<p class="who"><span class="lbl">{word}:</span> '
+                   f'{speaker_links(s["speakers"])}</p>')
 
         cards.append(
-            f'<article class="session{" is-plenary" if s.get("plenary") else ""}" '
-            f'id="{s["anchor"]}" tabindex="-1">'
+            f'<article class="session" id="{s["anchor"]}" tabindex="-1" '
+            f'data-room="{e(s["room"])}" data-time="{e(s["time"])}" '
+            f'data-topics="{e("|".join(topics_of(s["anchor"])))}">'
             f'<div class="badges">{"".join(badges)}</div>'
-            f'<h3>{e(s["label"])}: {e(s["title"])}</h3>'
+            f'<h3>{e(s["title"])}</h3>'
             f'{who}<p class="desc">{e(s["description"])}</p></article>'
         )
 
     return ('<h2 class="panel-head">Sessions</h2>'
             f'<p class="panel-sub">{len(D.SESSIONS)} sessions across the Star and Avalon '
-            'theatres. Speaker names link through to their profiles.</p>'
-            '<div class="sessions">' + "".join(cards) + '</div>')
+            'theatres. Filter below, or tap a speaker name for their profile.</p>'
+            + render_filters()
+            + '<div class="sessions">' + "".join(cards) + '</div>'
+            + '<div class="empty" id="fempty" hidden>No sessions match those filters.</div>')
+
+
+def session_lines(slug):
+    """The 'Speaking in' block — same markup on the card and in the modal."""
+    out = []
+    for s in SESSIONS_FOR.get(slug, []):
+        out.append(f'<a href="#{s["anchor"]}">{e(s["title"])}</a>'
+                   f'<br><span class="note">{e(s["time"])} &middot; {e(s["room"])}</span>')
+    if not out:
+        return ""
+    label = "Speaking in" if len(out) == 1 else "Speaking in"
+    return (f'<p class="in-session"><span class="lbl">{label}</span>'
+            + "<br>".join(out) + '</p>')
 
 
 def render_speakers():
     cards = []
     for sp in D.SPEAKERS:
         pending = sp["bio"] == D.BIO_PENDING
-        bio_id = f'bio-{sp["slug"]}'
-        badge = ('<div class="spk-badges"><span class="badge intl">International</span></div>'
-                 if sp.get("international") else "")
-
-        if pending:
-            note = f'<p class="pending-note">{e(sp["bio"])}</p>'
-            toggle = ""
-            bio_block = ""
-        else:
-            note = ""
-            toggle = (f'<button class="bio-btn" type="button" aria-expanded="false" '
-                      f'aria-controls="{bio_id}">Read bio</button>')
-            bio_block = f'<p class="bio" id="{bio_id}" hidden>{e(sp["bio"])}</p>'
+        sessions = session_lines(sp["slug"])
 
         linkedin = (f'<a class="li" href="{e(sp["linkedin"])}" target="_blank" rel="noopener">'
                     f'{LINKEDIN_SVG}<span>LinkedIn</span>'
                     f'<span class="sr"> profile for {e(sp["name"])} (opens in a new tab)</span>'
                     f'</a>')
+        learn = ('<button class="learn-btn" type="button">Learn more</button>'
+                 if not pending else "")
+        note = f'<p class="pending-note">{e(sp["bio"])}</p>' if pending else ""
+
+        # Detail block: shown inline without JS, moved into the modal with JS.
+        detail = ""
+        if not pending:
+            detail = (f'<div class="spk-detail">{sessions}'
+                      f'<p class="bio">{e(sp["bio"])}</p></div>')
 
         cards.append(
-            f'<article class="spk" id="{sp["slug"]}" tabindex="-1">'
+            f'<article class="spk" id="{sp["slug"]}" tabindex="-1" '
+            f'data-name="{e(sp["name"])}" data-role="{e(sp["title"])}" '
+            f'data-org="{e(sp["org"])}" data-linkedin="{e(sp["linkedin"])}" '
+            f'data-img="images/headshots/{sp["slug"]}.jpg" '
+            f'data-intl="{"1" if sp.get("international") else "0"}">'
             f'<img src="images/headshots/{sp["slug"]}.jpg" width="120" height="120" '
             f'loading="lazy" decoding="async" alt="{e(sp["name"])}">'
             f'<h3>{e(sp["name"])}</h3>'
             f'<p class="role">{e(sp["title"])}</p>'
             f'<p class="org">{e(sp["org"])}</p>'
-            f'{badge}{note}'
-            f'<div class="actions">{toggle}{linkedin}</div>'
-            f'{bio_block}</article>'
+            f'{sessions}{note}'
+            f'<div class="actions">{learn}{linkedin}</div>'
+            f'{detail}</article>'
         )
 
     return ('<h2 class="panel-head">Speakers</h2>'
             f'<p class="panel-sub">{len(D.SPEAKERS)} speakers, listed alphabetically. '
-            'Tap “Read bio” for more.</p>'
+            'Tap “Learn more” for a full profile.</p>'
             '<div class="speakers">' + "".join(cards) + '</div>')
 
 
 def render_sponsors():
-    items = []
-    for s in D.SPONSORS:
-        items.append(
-            f'<li><a href="{e(s["url"])}" target="_blank" rel="noopener" '
-            f'title="{e(s["name"])} (opens in a new tab)">'
-            f'<img src="images/sponsors/{e(s["file"])}" width="{s["w"]}" height="{s["h"]}" '
-            f'loading="lazy" decoding="async" alt="{e(s["name"])}"></a></li>'
-        )
+    items = "".join(
+        f'<li><a href="{e(s["url"])}" target="_blank" rel="noopener" '
+        f'title="{e(s["name"])} (opens in a new tab)">'
+        f'<img src="images/sponsors/{e(s["file"])}" width="{s["w"]}" height="{s["h"]}" '
+        f'loading="lazy" decoding="async" alt="{e(s["name"])}"></a></li>'
+        for s in D.SPONSORS
+    )
     return ('<div class="sponsors-wrap"><h2>Thank You to Our Sponsors</h2>'
-            '<p class="note">This event would not be possible without them.</p>'
-            '<ul class="sponsors">' + "".join(items) + '</ul></div>')
+            f'<ul class="sponsors">{items}</ul></div>')
+
+
+def render_modal():
+    return f"""
+<div class="modal" id="modal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-name">
+    <button class="modal-x" type="button" data-close aria-label="Close profile">&times;</button>
+    <img id="modal-img" alt="" width="150" height="150"
+         src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+    <h3 id="modal-name"></h3>
+    <p id="modal-role"></p>
+    <p id="modal-org"></p>
+    <div id="modal-badges"></div>
+    <div id="modal-body"></div>
+    <div class="modal-foot">
+      <a class="li" id="modal-li" href="#" target="_blank" rel="noopener">
+        {LINKEDIN_SVG}<span>View LinkedIn profile</span></a>
+    </div>
+  </div>
+</div>"""
 
 
 TABS = [("panel-schedule", "Schedule"), ("panel-sessions", "Sessions"),
@@ -628,18 +865,14 @@ def render_page():
         f'tabindex="{0 if i == 0 else -1}">{label}</a>'
         for i, (pid, label) in enumerate(TABS)
     )
-
-    panels = [
-        ("panel-schedule", render_schedule()),
-        ("panel-sessions", render_sessions()),
-        ("panel-speakers", render_speakers()),
-    ]
+    panels = [("panel-schedule", render_schedule()),
+              ("panel-sessions", render_sessions()),
+              ("panel-speakers", render_speakers())]
     panels_html = "".join(
         f'<section role="tabpanel" id="{pid}" aria-labelledby="tab-{pid}" tabindex="0">'
         f'{body}</section>'
         for pid, body in panels
     )
-
     desc = (f"{ev['name']} — {ev['date']}, {ev['venue']}. "
             "Full programme, sessions and speakers.")
 
@@ -650,7 +883,7 @@ def render_page():
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(ev['name'])}</title>
 <meta name="description" content="{e(desc)}">
-<meta name="theme-color" content="{D.__dict__.get('THEME_COLOR', '#303249')}">
+<meta name="theme-color" content="#303249">
 <meta property="og:type" content="website">
 <meta property="og:title" content="{e(ev['name'])}">
 <meta property="og:description" content="{e(desc)}">
@@ -669,10 +902,6 @@ def render_page():
 <a class="skip" href="#panel-schedule">Skip to content</a>
 <header>
   <div class="bar">
-    <span class="mark">
-      <img src="images/{e(ev['logo']['file'])}" width="{ev['logo']['w']}"
-           height="{ev['logo']['h']}" alt="{e(ev['name'])}">
-    </span>
     <nav role="tablist" aria-label="Sections">{tabs}</nav>
   </div>
 </header>
@@ -686,6 +915,7 @@ def render_page():
     <a href="https://shawnlife.com" target="_blank" rel="noopener">ShawnLife</a></p>
 </footer>
 <button id="backpill" type="button" hidden>&larr; <span id="backpill-text">Back</span></button>
+{render_modal()}
 <script>{JS}</script>
 </body>
 </html>
@@ -693,14 +923,12 @@ def render_page():
 
 
 def validate(page):
-    """Every internal #anchor must point at an element that exists."""
     ids = set(re.findall(r'\sid="([^"]+)"', page))
     refs = set(re.findall(r'href="#([^"]+)"', page))
     dead = sorted(r for r in refs if r not in ids)
     if dead:
         sys.exit("Dead internal links (no element with that id):\n  " + "\n  ".join(dead))
 
-    # Every speaker needs a built headshot, and every session a real room.
     missing = [sp["slug"] for sp in D.SPEAKERS
                if not (ROOT / "images" / "headshots" / f'{sp["slug"]}.jpg').exists()]
     if missing:
@@ -710,13 +938,18 @@ def validate(page):
         if not (ROOT / "images" / "sponsors" / s["file"]).exists():
             sys.exit(f'Missing sponsor logo: images/sponsors/{s["file"]}')
 
-    # Every speaker should appear in at least one session, and vice versa.
-    used = {slug for s in D.SESSIONS for slug, _ in s["speakers"]}
-    orphan_speakers = sorted(set(BY_SLUG) - used)
-    if orphan_speakers:
-        print("  note: speakers not in any session: " + ", ".join(orphan_speakers))
+    # Every session needs a topic, or the filter silently hides it.
+    untagged = sorted(a for a in BY_ANCHOR if not topics_of(a))
+    if untagged:
+        sys.exit("Sessions with no topic tag in TOPICS:\n  " + "\n  ".join(untagged))
+    stray = sorted(set(D.TOPICS) - set(BY_ANCHOR)) + sorted(set(D.PANELS) - set(BY_ANCHOR))
+    if stray:
+        sys.exit("TOPICS/PANELS refer to unknown sessions:\n  " + "\n  ".join(stray))
 
-    # Every session must be reachable from the schedule.
+    # Every speaker in a session, every session in the schedule.
+    orphans = sorted(s for s, v in SESSIONS_FOR.items() if not v)
+    if orphans:
+        print("  note: speakers not in any session: " + ", ".join(orphans))
     scheduled = set()
     for slot in D.SCHEDULE:
         for key in ("item", "star", "avalon"):
@@ -725,7 +958,6 @@ def validate(page):
     unscheduled = sorted(set(BY_ANCHOR) - scheduled)
     if unscheduled:
         sys.exit("Sessions missing from the schedule:\n  " + "\n  ".join(unscheduled))
-
     return len(ids), len(refs)
 
 
@@ -733,10 +965,10 @@ def main():
     page = render_page()
     n_ids, n_refs = validate(page)
     OUT.write_text(page, encoding="utf-8")
-    kb = OUT.stat().st_size / 1024
-    print(f"Wrote index.html — {kb:.0f} KB")
+    print(f"Wrote index.html — {OUT.stat().st_size / 1024:.0f} KB")
     print(f"  {len(D.SCHEDULE)} schedule slots, {len(D.SESSIONS)} sessions, "
           f"{len(D.SPEAKERS)} speakers, {len(D.SPONSORS)} sponsors")
+    print(f"  {len(ALL_TOPICS)} topics: " + ", ".join(ALL_TOPICS))
     print(f"  {n_refs} internal links checked against {n_ids} anchors — all resolve")
 
 

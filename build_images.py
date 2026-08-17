@@ -57,17 +57,19 @@ HEADSHOTS = {
     "Toni Erasmus Headshot.jpg": "toni-erasmus",
 }
 
-# A few sources are full-body or environmental shots where the face ends up tiny
-# (or clipped) in a 120px circle. These re-frame to head-and-shoulders before
-# resizing. Values are (left, top, right, bottom) as fractions of the
-# EXIF-corrected original, and each box is deliberately square.
-CROP = {
-    "angela-blackwell": (0.22, 0.03, 0.84, 0.38),    # seated full-body with guide dog
-    "ian-parsons": (0.275, 0.267, 0.725, 0.567),     # wide outdoor shot, seated
-    "roland-postma": (0.267, 0.155, 0.747, 0.515),   # standing three-quarter
-    "malusi-ntoyapi": (0.14, 0.02, 0.79, 0.52),      # arms-folded torso shot
-    "phano-liphoto": (0.0, 0.105, 1.0, 0.728),       # tight selfie, centre on the face
-}
+# Headshot framing is computed per photo by detecting the face (see
+# square_crop_on_face). The sources range from tight selfies to full-body shots
+# with a guide dog, so a single fixed rule clipped heads on several of them.
+#
+# How much of the crop height the face should occupy, and where its centre sits
+# vertically. Heads belong above the middle, hence 0.42 rather than 0.5.
+FACE_FRACTION = 0.38
+FACE_CENTRE_Y = 0.42
+HEAD_MARGIN = 0.05      # keep at least this much of the crop above the face box
+
+# Only for photos where detection fails or gets it wrong. Fractions of the
+# EXIF-corrected original: (left, top, right, bottom).
+MANUAL_CROP = {}
 
 SPONSORS = {
     "0924974_0.webp": "resource-alliance",
@@ -93,30 +95,137 @@ def fit(img, longest):
     return img.resize(size, Image.LANCZOS)
 
 
+def detect_face(img):
+    """Largest face as (x, y, w, h) in image pixels, or None.
+
+    OpenCV's frontal-face cascade. Photos here are all posed portraits, which is
+    exactly what it is good at.
+    """
+    try:
+        import cv2
+        import numpy as np
+    except ImportError:
+        return None
+
+    cascade = cv2.CascadeClassifier(
+        cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    if cascade.empty():
+        return None
+
+    # Detect on a downscaled copy: faster, and less sensitive to sensor noise.
+    work = fit(img, 900)
+    scale = img.width / work.width
+    grey = cv2.cvtColor(np.array(work), cv2.COLOR_RGB2GRAY)
+    grey = cv2.equalizeHist(grey)
+
+    faces = cascade.detectMultiScale(
+        grey, scaleFactor=1.08, minNeighbors=6,
+        minSize=(int(work.width * 0.06), int(work.width * 0.06)))
+    if len(faces) == 0:
+        return None
+
+    x, y, w, h = max(faces, key=lambda f: f[2] * f[3])
+    return (x * scale, y * scale, w * scale, h * scale)
+
+
+def extend_edges(img, pad, horizontal):
+    """Grow the image by `pad` on both sides, replicating the edge pixels.
+
+    Used when a photo is framed too tightly to yield a square containing the
+    whole head. Stretching the outermost row/column blends into a plain studio
+    or wall background; a flat average colour leaves a visible seam.
+    """
+    if horizontal:
+        canvas = Image.new("RGB", (img.width + pad * 2, img.height))
+        canvas.paste(img.crop((0, 0, 1, img.height)).resize((pad, img.height)), (0, 0))
+        canvas.paste(img.crop((img.width - 1, 0, img.width, img.height))
+                     .resize((pad, img.height)), (pad + img.width, 0))
+        canvas.paste(img, (pad, 0))
+    else:
+        canvas = Image.new("RGB", (img.width, img.height + pad * 2))
+        canvas.paste(img.crop((0, 0, img.width, 1)).resize((img.width, pad)), (0, 0))
+        canvas.paste(img.crop((0, img.height - 1, img.width, img.height))
+                     .resize((img.width, pad)), (0, pad + img.height))
+        canvas.paste(img, (0, pad))
+    return canvas
+
+
+def square_crop_on_face(img, face):
+    """Square crop framing the detected face as a headshot.
+
+    Sizes the square so the face fills FACE_FRACTION of it, centres it
+    horizontally on the face and places the face centre at FACE_CENTRE_Y.
+    If the photo is framed too tightly for a square that holds the whole head,
+    pads the narrow sides with the background colour rather than clipping.
+    """
+    fx, fy, fw, fh = face
+    fcx, fcy = fx + fw / 2, fy + fh / 2
+
+    side = fh / FACE_FRACTION
+
+    # Never let the top of the head fall outside the crop.
+    needed = (fcy - (fy - HEAD_MARGIN * side)) / FACE_CENTRE_Y
+    side = max(side, min(needed, img.height))
+    side = min(side, max(img.width, img.height))
+
+    if side > img.width:
+        pad = int(side - img.width) // 2 + 1
+        img, fcx = extend_edges(img, pad, True), fcx + pad
+    if side > img.height:
+        pad = int(side - img.height) // 2 + 1
+        img, fcy, fy = extend_edges(img, pad, False), fcy + pad, fy + pad
+
+    side = min(side, img.width, img.height)
+    left = fcx - side / 2
+    top = fcy - side * FACE_CENTRE_Y
+    top = min(top, fy - HEAD_MARGIN * side)          # guarantee headroom
+    left = max(0, min(left, img.width - side))
+    top = max(0, min(top, img.height - side))
+    return img.crop((round(left), round(top), round(left + side), round(top + side)))
+
+
 def build_headshots():
     missing = [n for n in HEADSHOTS if not (HEADSHOT_SRC / n).exists()]
     if missing:
         sys.exit("Missing headshot source files:\n  " + "\n  ".join(missing))
 
     manifest = {}
+    undetected = []
     for name, slug in sorted(HEADSHOTS.items(), key=lambda kv: kv[1]):
         src = HEADSHOT_SRC / name
         with Image.open(src) as img:
             # Phone photos carry EXIF rotation; without this some faces ship sideways.
+            # Phone photos carry EXIF rotation; without this some faces ship sideways.
             img = ImageOps.exif_transpose(img)
             if img.mode != "RGB":
                 img = img.convert("RGB")
-            if slug in CROP:
-                l, t, r, b = CROP[slug]
+
+            if slug in MANUAL_CROP:
+                l, t, r, b = MANUAL_CROP[slug]
                 img = img.crop((round(l * img.width), round(t * img.height),
                                 round(r * img.width), round(b * img.height)))
+                how = "manual"
+            else:
+                face = detect_face(img)
+                if face:
+                    img = square_crop_on_face(img, face)
+                    how = "face"
+                else:
+                    how = "NO FACE FOUND"
+                    undetected.append(slug)
+
             img = fit(img, HEADSHOT_MAX)
             dest = OUT_HEADSHOTS / f"{slug}.jpg"
             img.save(dest, "JPEG", quality=JPEG_QUALITY, optimize=True,
                      progressive=True)
             manifest[slug] = list(img.size)
         kb = dest.stat().st_size / 1024
-        print(f"  {slug:<22} {img.width:>4}x{img.height:<4}  {kb:6.0f} KB   <- {name}")
+        print(f"  {slug:<22} {img.width:>4}x{img.height:<4} {kb:6.0f} KB  {how:<14} <- {name}")
+
+    if undetected:
+        print("\n  !! no face detected, framing may be wrong: "
+              + ", ".join(undetected)
+              + "\n     add a MANUAL_CROP entry for these.")
     return manifest
 
 

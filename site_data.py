@@ -337,7 +337,7 @@ SPEAKERS = [
                "with the City of Cape Town in their Environmental Department, ICLEI – Local "
                "Governments for Sustainability, and UCT established her expertise in "
                "environmental management and international project delivery. Based in Cape "
-               "Town, Shona combines strong stakeholder engagement and strategic insight and "
+               "Town, Shona combines strong stakeholder engagement and strategic insight "
                "with a longstanding commitment to social impact, including serving as "
                "Chairperson of the Children’s Memorial Institute.",
     },
@@ -569,11 +569,9 @@ SESSIONS = [
 SCHEDULE = [
     {"time": "8:00 – 9:00", "kind": "full", "item": {
         "flavour": "logistics", "name": "Registration",
-        "detail": "In the lobby. Name tags, QR code to this site at the info desk. "
-                  "Sponsors set up along the lobby walls."}},
+        "detail": "In the lobby. Collect your name tag at the info desk."}},
     {"time": "9:00 – 9:15", "kind": "full", "item": {
-        "flavour": "remarks", "name": "Opening Remarks",
-        "detail": "Nyasha and Shawn welcome everyone, housekeeping, thank sponsors."}},
+        "flavour": "remarks", "name": "Opening Remarks", "detail": ""}},
     {"time": "9:15 – 10:00", "kind": "full", "item": {
         "flavour": "plenary", "session": "opening-plenary"}},
     {"time": "10:10 – 10:55", "kind": "split", "star": {"session": "session-1a"},
@@ -599,9 +597,32 @@ SCHEDULE = [
     {"time": "16:00 – 16:45", "kind": "full", "item": {
         "flavour": "plenary", "session": "closing-plenary"}},
     {"time": "16:45 – 17:00", "kind": "full", "item": {
-        "flavour": "remarks", "name": "Closing Remarks",
-        "detail": "Thank sponsors, share about IFC Amsterdam."}},
+        "flavour": "remarks", "name": "Closing Remarks", "detail": ""}},
 ]
+
+# ---------------------------------------------------------------------------
+# Topic tags, used for the filter chips on the Sessions tab. The chips are
+# generated from whatever appears here, so renaming a topic or re-tagging a
+# session is all it takes — nothing else needs changing.
+# ---------------------------------------------------------------------------
+
+TOPICS = {
+    "opening-plenary": ["Philanthropy"],
+    "session-1a": ["Fundraising Practice"],
+    "session-1b": ["Technology & AI"],
+    "session-2a": ["Fundraising Practice", "Community & Storytelling"],
+    "session-2b": ["Funders & Partnerships"],
+    "session-3a": ["Funders & Partnerships"],
+    "session-3b": ["Leadership & Strategy"],
+    "session-4a": ["Social Enterprise & Finance"],
+    "session-4b": ["Fundraising Practice"],
+    "session-5a": ["Impact & Measurement"],
+    "session-5b": ["Community & Storytelling"],
+    "closing-plenary": ["Leadership & Strategy"],
+}
+
+# Sessions run as a moderated panel rather than a talk.
+PANELS = {"session-1a", "session-3a"}
 
 # ---------------------------------------------------------------------------
 # Sponsors — displayed in this order, on white tiles (several logos are

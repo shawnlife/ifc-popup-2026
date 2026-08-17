@@ -19,9 +19,9 @@ them into fonts/ with these filenames and skip this script entirely.
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).parent
-SRC = ROOT / "graphik-font-family"
-OUT = ROOT / "fonts"
+ROOT = Path(__file__).parent.parent      # project root, not build/
+SRC = ROOT / "source" / "fonts-graphik"
+OUT = ROOT / "assets" / "fonts"
 
 # CSS weight -> (source file, output file). Only what the stylesheet uses; there
 # is no point shipping 145 weights to render four.

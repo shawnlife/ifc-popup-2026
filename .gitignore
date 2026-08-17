@@ -2,23 +2,11 @@
 __pycache__/
 *.pyc
 
-# Original photos and logos: ~72MB, kept on Shawn's Desktop only.
-# build_images.py turns these into the small copies in images/.
-/Headshots/
-/*.webp
-/*.JPG
-/*.jpg
-/*.jpeg
-/Pop-Up Cape Town logo white no shadow.png
-/Weaver logo Dark.png
-/Matogen_Digital_Logo.png
-/DB.png
-
-# Graphik trial weights from befonts.com — licence reads "Personal Use Only",
-# which does not cover a public sponsored event site. Local preview only.
-/graphik-font-family/
-
-# Original logo artwork. Sources only — build_images.py turns these into the
-# slug-named copies in images/sponsors/. Keeping them out of images/ stops
-# originals being shipped to the live site by accident.
-/source-logos/
+# Originals: the big photos, the logo artwork, the Graphik family. Roughly 85MB,
+# none of which belongs on the live site — the build turns them into the small
+# files in assets/. Kept on Shawn's Desktop only.
+#
+# Sources live in source/ and generated files in assets/, deliberately never in
+# the same folder: when the logo originals sat beside the generated ones, nine
+# of them got committed and shipped to the live site by accident.
+/source/

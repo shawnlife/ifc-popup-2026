@@ -8,114 +8,107 @@ and read the programme on their phones.
 
 ---
 
-## How to change something
+## Where everything lives
 
-All the words live in **`site_data.py`** — speaker names, titles, bios, session
-descriptions, times, sponsor links. Open it, edit the text, then run:
+```
+index.html          The site. GENERATED — never edit this by hand.
+build.py            Rebuilds everything. Start here.
 
-```bash
-python3 build_site.py
+build/              The scripts that make the site
+  site_data.py        ← ALL THE WORDS. This is the file you edit.
+  build_site.py       Turns site_data.py into index.html (holds the CSS + JS)
+  build_images.py     source/ photos + logos  ->  assets/images/
+  build_fonts.py      source/ Graphik .otf    ->  assets/fonts/ .woff2
+  make_qr.py          Makes the QR code and printable card
+
+assets/             What the live site actually loads (small, committed)
+  images/             logo, headshots/, sponsors/, hero/
+  fonts/              graphik-400/500/600/700.woff2
+
+source/             ORIGINALS. Big, and never published. Not in git.
+  headshots/          The photos speakers sent
+  logos/              Sponsor logo artwork as supplied
+  hero-photos/        2025 event photos by LIFEbrand
+  fonts-graphik/      The Graphik family
+
+analytics/          Usage tracking — see analytics/SETUP.md
+docs/               The original project brief
+qr/                 QR code + print-ready A5 card
 ```
 
-That rewrites `index.html`. It also checks that every internal link still points
-at something real, so a tapped session or speaker name can never lead nowhere.
-If a link breaks, it tells you and refuses to write the file.
+The rule that matters: **sources go in `source/`, generated files come out in
+`assets/`, and the two never share a folder.** They used to, and nine original
+logo files got shipped to the live site by accident.
 
-To publish the change:
+---
+
+## Changing something
+
+**Words** — speaker titles, bios, session descriptions, times, sponsor links,
+the Info tab, topic tags — all live in **`build/site_data.py`**. Edit it, then:
+
+```bash
+python3 build.py --site
+```
+
+That rewrites `index.html`. It also checks every internal link still points at
+something real, and refuses to write the file if one is broken.
+
+**A photo or logo changed?** Drop it in the matching `source/` folder, update
+the filename map at the top of `build/build_images.py`, then:
+
+```bash
+python3 build.py
+```
+
+**Publishing** — from this folder:
 
 ```bash
 git add -A && git commit -m "Update speaker bio" && git push
 ```
 
-GitHub Pages picks it up within a minute or so.
-
-## If a photo changes
-
-Drop the new photo in `Headshots/`, add or update its entry in the map at the top
-of `build_images.py`, then:
-
-```bash
-python3 build_images.py && python3 build_site.py
-```
-
-`build_images.py` resizes the originals (72MB) down to web copies (~1.1MB),
-corrects EXIF rotation, and re-frames the handful of full-body shots so the face
-fills the circle. Originals are never modified.
+GitHub Pages picks it up within a minute or two.
 
 ---
-
-## Files
-
-| File | What it is |
-|---|---|
-| `index.html` | The whole site. Generated — edit `site_data.py` instead. |
-| `site_data.py` | All copy: schedule, sessions, speakers, sponsors. |
-| `build_site.py` | Builds `index.html`. Holds the CSS and JS. |
-| `build_images.py` | Resizes and re-frames photos into `images/`. |
-| `images/` | Web-ready logo, headshots, sponsor logos. |
-| `make_qr.py` | Builds the QR code + printable A5 card in `qr/`. |
-| `qr/` | QR code (PNG + SVG) and a print-ready A5 card for the info desk. |
-| `Headshots/`, `*.webp` | Originals. Not committed — local only. |
 
 ## Notes
 
 - One self-contained HTML file: embedded CSS and JS, no frameworks, no build
-  step needed to view it. Just open `index.html`.
+  step needed to *view* it. Just open `index.html`.
 - Four tabs (Schedule / Sessions / Speakers / Info). Only one shows at a time.
   Links between them switch tabs and jump to the right card, with a "back" pill
   to return. Without JavaScript it degrades to one long readable page.
-- The Info tab ("On the Day") is built from `INFO_INTRO`, `INFO_BLOCKS` and
-  `INFO_OUTRO` in `site_data.py`. A block takes `items` (bulleted) or `body`
-  (paragraphs), optionally `html` for a block containing a link, `hashtag`, and
-  `link` for a button such as "Open in Maps".
-- Tapping a speaker's name anywhere opens their profile in a pop-up: big
-  headshot, bio, which session they're in, LinkedIn. Without JavaScript the same
-  content simply shows inline on the card instead.
-- The Sessions tab filters by theatre, time and topic. Topic tags live in
-  `TOPICS` in `site_data.py` — the filter chips are generated from whatever is
-  in there, so renaming or re-tagging needs no other change.
-- Sponsor logos sit on one pale band rather than individual white tiles.
-  Something light is needed behind them: Weaver, Downes Murray, CCA and Matogen
-  are all dark-on-transparent and vanish on the navy background.
-- Headshot framing is computed by face detection (`build_images.py`), not a
-  fixed crop rule, because the sources range from tight selfies to full-body
-  shots. Photos framed too tightly for a square get their edge pixels extended
-  rather than the head clipped.
-- Font is Inter (Graphik is commercial and unavailable); the CSS asks for
-  Graphik first, so licensed webfont files would drop straight in.
-
-## Fonts
-
-The live site uses **Inter**. The CSS asks for Graphik first, so licensed
-Graphik webfont files would take over with no code change.
-
-`graphik-font-family/` holds **trial** weights whose licence reads "Personal Use
-Only" — that does not cover a public event site with paying sponsors, so they are
-gitignored and `index.html` never references them. To judge the typeface:
-
-```bash
-python3 build_site.py --graphik
-```
-
-That writes `preview-graphik.html` (also gitignored) using the local files. A
-real web licence comes from Commercial Type, who own Graphik.
+- Tapping a speaker card anywhere opens their profile pop-up: big headshot, bio,
+  which session they're in, LinkedIn. Tapping a schedule box opens that session.
+- The Sessions tab filters by theatre, time and topic. Topic tags are the
+  `TOPICS` dict in `site_data.py`; the dropdown is generated from whatever is in
+  there, so renaming or re-tagging needs no other change.
+- Sponsor logos sit on one white panel. White specifically: Donorbox and Downes
+  Murray have opaque white backgrounds baked in, and Turning Point's is opaque
+  dark navy, so no other single colour works for all three.
+- Headshot framing is computed by face detection, not a fixed crop rule, because
+  the sources range from tight selfies to full-body shots. Photos framed too
+  tightly for a square get their edge pixels extended rather than the head
+  clipped.
+- **Graphik is self-hosted** from `assets/fonts/`. No Google Fonts, so the page
+  makes no third-party requests except the analytics beacon — nothing to leak,
+  and nothing to fail on conference wifi.
+- `.nojekyll` stops GitHub running its Jekyll pipeline over the repo. A Pages
+  build failed on it once; nothing here is a Jekyll site.
 
 ## Usage tracking
 
-Off by default. `analytics/SETUP.md` has the full walkthrough; the short version
-is: make a Google Sheet, paste `analytics/apps_script.js` into Apps Script,
-deploy it as a web app with access set to **Anyone**, then put the `/exec` URL
-into `ANALYTICS_URL` in `site_data.py` and rebuild.
+Live. Full walkthrough in `analytics/SETUP.md`.
 
-It records which sessions and speaker profiles get opened, which tabs and filters
-get used, and ticket clicks. No cookies, no storage on the visitor's device, no
-IP or demographic data — so no consent banner is needed. While `ANALYTICS_URL` is
-`None`, no tracking code is written into `index.html` at all.
+Records which sessions and speaker profiles get opened, which tabs and filters
+get used, and every outbound link click (sponsors, train schedule, maps,
+LinkedIn by whose profile). No cookies, nothing stored on the visitor's device,
+no IP or demographic data — so **no consent banner is needed**. Turn it off by
+setting `ANALYTICS_URL = None` in `site_data.py`; the tracking code then isn't
+written into the page at all.
 
-`analytics/dashboard.html` is a local dashboard that reads the summary and
-refreshes every 60 seconds. `analytics/names.js` is generated by
-`build_site.py` so the dashboard can show real titles while the backend stores
-only ids.
+`analytics/dashboard.html` is the local dashboard — open it, click **Change
+URL**, paste the Apps Script `/exec` URL. Refreshes every 60 seconds.
 
 ## The QR code for the day
 
@@ -125,20 +118,11 @@ decoded back to the live URL to confirm they scan.
 **If the site moves to a custom domain, regenerate and reprint:**
 
 ```bash
-python3 make_qr.py https://ifc.shawnlife.com/
+python3 build/make_qr.py https://ifc.shawnlife.com/
 ```
-
-## Hero background
-
-`EVENT["hero"]` in `site_data.py` picks the photo behind the logo. Options are
-the slugs in `HEROES` in `build_images.py` — `theatre-blue`, `stage-amber`,
-`audience` — or `None` for plain navy. All three are already built at two widths
-(phones load the 900px file), so switching is a one-word change plus a rebuild.
 
 ### Still outstanding
 
 - A higher-resolution Fundraising Beyond Borders logo (current is 200×50px)
-- Cooktastic and Homecoming Centre logos to add to the sponsor band
-- Social handles for the "Get social" block, if those names should be links
-- Custom domain (`ifc.shawnlife.com`) — needs a DNS record plus a `CNAME` file,
-  and a reprinted QR code
+- Custom domain `ifc.shawnlife.com` — DNS record plus a `CNAME` file, and a
+  reprinted QR code

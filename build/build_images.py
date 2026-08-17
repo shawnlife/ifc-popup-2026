@@ -18,13 +18,14 @@ from pathlib import Path
 
 from PIL import Image, ImageOps
 
-ROOT = Path(__file__).parent
-HEADSHOT_SRC = ROOT / "Headshots"
+ROOT = Path(__file__).parent.parent      # project root, not build/
+SRC = ROOT / "source"
+HEADSHOT_SRC = SRC / "headshots"
 # Original logos live here, mirroring Headshots/. They used to sit loose in the
 # project root, which made it easy to drop copies into images/sponsors/ by
 # mistake and ship them. Sources in, generated files out — never mixed.
-LOGO_SRC = ROOT / "source-logos"
-OUT = ROOT / "images"
+LOGO_SRC = SRC / "logos"
+OUT = ROOT / "assets" / "images"
 OUT_HEADSHOTS = OUT / "headshots"
 OUT_SPONSORS = OUT / "sponsors"
 OUT_HERO = OUT / "hero"
@@ -326,7 +327,7 @@ def build_heroes():
     OUT_HERO.mkdir(parents=True, exist_ok=True)
     manifest = {}
     for name, slug in sorted(HEROES.items(), key=lambda kv: kv[1]):
-        with Image.open(ROOT / name) as img:
+        with Image.open(SRC / "hero-photos" / name) as img:
             img = ImageOps.exif_transpose(img)
             if img.mode != "RGB":
                 img = img.convert("RGB")

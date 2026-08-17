@@ -19,7 +19,7 @@ from pathlib import Path
 
 import site_data as D
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).parent.parent      # project root, not build/
 OUT = ROOT / "index.html"
 SITE_URL = "https://shawnlife.github.io/ifc-popup-2026/"
 
@@ -907,11 +907,11 @@ def render_schedule():
     hero_cls = "hero has-photo" if photo else "hero"
     style = ""
     if photo:
-        style = (f' style="--hero-sm:url(images/hero/{photo}-900.jpg);'
-                 f'--hero-lg:url(images/hero/{photo}-1800.jpg)"')
+        style = (f' style="--hero-sm:url(assets/images/hero/{photo}-900.jpg);'
+                 f'--hero-lg:url(assets/images/hero/{photo}-1800.jpg)"')
     hero = f"""
     <div class="{hero_cls}"{style}>
-      <img src="images/{e(logo['file'])}" width="{logo['w']}" height="{logo['h']}"
+      <img src="assets/images/{e(logo['file'])}" width="{logo['w']}" height="{logo['h']}"
            alt="IFC Cape Town Pop-Up 2026">
       <h1>{e(ev['headline'])}</h1>
       <p class="meta"><b>{e(ev['date'])}</b><span>{e(ev['venue'])}</span></p>
@@ -1015,7 +1015,7 @@ def render_speakers():
             f'data-org="{e(sp["org"])}" data-linkedin="{e(sp["linkedin"])}" '
             f'data-img="images/headshots/{sp["slug"]}.jpg" '
             f'data-intl="{"1" if sp.get("international") else "0"}">'
-            f'<img src="images/headshots/{sp["slug"]}.jpg" width="120" height="120" '
+            f'<img src="assets/images/headshots/{sp["slug"]}.jpg" width="120" height="120" '
             f'loading="lazy" decoding="async" alt="{e(sp["name"])}">'
             f'<h3>{e(sp["name"])}</h3>'
             f'<p class="role">{e(sp["title"])}</p>'
@@ -1076,7 +1076,7 @@ def render_sponsors():
     items = "".join(
         f'<li><a href="{e(s["url"])}" target="_blank" rel="noopener" '
         f'title="{e(s["name"])} (opens in a new tab)">'
-        f'<img src="images/sponsors/{e(s["file"])}" width="{s["w"]}" height="{s["h"]}" '
+        f'<img src="assets/images/sponsors/{e(s["file"])}" width="{s["w"]}" height="{s["h"]}" '
         f'loading="lazy" decoding="async" alt="{e(s["name"])}"></a></li>'
         for s in D.SPONSORS
     )
@@ -1114,11 +1114,11 @@ def font_block():
     system font and swaps when the woff2 lands."""
     faces = "\n".join(
         f"@font-face{{font-family:'Graphik';font-style:normal;font-weight:{w};"
-        f"font-display:swap;src:url('fonts/{f}') format('woff2')}}"
+        f"font-display:swap;src:url('assets/fonts/{f}') format('woff2')}}"
         for w, f in sorted(GRAPHIK.items()))
     # Preload only the two weights that appear above the fold.
     pre = "\n".join(
-        f'<link rel="preload" href="fonts/{GRAPHIK[w]}" as="font" '
+        f'<link rel="preload" href="assets/fonts/{GRAPHIK[w]}" as="font" '
         f'type="font/woff2" crossorigin>' for w in (400, 700))
     return f"{pre}\n<style>\n{faces}\n</style>"
 
@@ -1157,9 +1157,9 @@ def render_page():
     if ev.get("hero"):
         h = ev["hero"]
         preload = (
-            f'<link rel="preload" as="image" href="images/hero/{h}-900.jpg"'
+            f'<link rel="preload" as="image" href="assets/images/hero/{h}-900.jpg"'
             f' media="(max-width: 899px)">\n'
-            f'<link rel="preload" as="image" href="images/hero/{h}-1800.jpg"'
+            f'<link rel="preload" as="image" href="assets/images/hero/{h}-1800.jpg"'
             f' media="(min-width: 900px)">')
 
     return f"""<!DOCTYPE html>
@@ -1174,10 +1174,10 @@ def render_page():
 <meta property="og:title" content="{e(ev['name'])}">
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{SITE_URL}">
-<meta property="og:image" content="{SITE_URL}images/{e(ev['logo']['file'])}">
+<meta property="og:image" content="{SITE_URL}assets/images/{e(ev['logo']['file'])}">
 <meta name="twitter:card" content="summary">
-<link rel="icon" href="images/logo.png">
-<link rel="apple-touch-icon" href="images/logo.png">
+<link rel="icon" href="assets/images/logo.png">
+<link rel="apple-touch-icon" href="assets/images/logo.png">
 {preload}
 {font_block()}
 <style>{CSS}</style>
@@ -1216,13 +1216,13 @@ def validate(page):
         sys.exit("Dead internal links (no element with that id):\n  " + "\n  ".join(dead))
 
     missing = [sp["slug"] for sp in D.SPEAKERS
-               if not (ROOT / "images" / "headshots" / f'{sp["slug"]}.jpg').exists()]
+               if not (ROOT / "assets" / "images" / "headshots" / f'{sp["slug"]}.jpg').exists()]
     if missing:
         sys.exit("Missing headshot images (run build_images.py first):\n  "
                  + "\n  ".join(missing))
     for s in D.SPONSORS:
-        if not (ROOT / "images" / "sponsors" / s["file"]).exists():
-            sys.exit(f'Missing sponsor logo: images/sponsors/{s["file"]}')
+        if not (ROOT / "assets" / "images" / "sponsors" / s["file"]).exists():
+            sys.exit(f'Missing sponsor logo: assets/images/sponsors/{s["file"]}')
 
     # Every session needs a topic, or the filter silently hides it.
     untagged = sorted(a for a in BY_ANCHOR if not topics_of(a))
@@ -1263,7 +1263,7 @@ def write_analytics_names():
 
 
 def main():
-    missing = [f for f in GRAPHIK.values() if not (ROOT / "fonts" / f).exists()]
+    missing = [f for f in GRAPHIK.values() if not (ROOT / "assets" / "fonts" / f).exists()]
     if missing:
         sys.exit("Missing webfonts (run build_fonts.py first):\n  " + "\n  ".join(missing))
 

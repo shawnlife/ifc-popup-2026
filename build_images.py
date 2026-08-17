@@ -82,6 +82,10 @@ SPONSORS = {
     "LIFEBrand.webp": "lifebrand",
     "Matogen_Digital_Logo.png": "matogen",
     "Weaver logo Dark.png": "weaver-network",
+    "HCC Logo Stacked.png": "homecoming-centre",
+    # Vector: copied through untouched and used as-is in an <img>, so it stays
+    # crisp at any size instead of being rasterised to a fixed width.
+    "logo_cooktastic_circle.svg": "cooktastic",
 }
 
 MAIN_LOGO = "Pop-Up Cape Town logo white no shadow.png"
@@ -250,6 +254,15 @@ def build_sponsors():
         src = ROOT / name
         ext = src.suffix.lower()
         dest = OUT_SPONSORS / f"{slug}{ext}"
+
+        if ext == ".svg":
+            # Vector: nothing to resize, and PIL cannot read it anyway.
+            shutil.copy2(src, dest)
+            manifest[slug] = {"file": dest.name, "w": None, "h": None}
+            print(f"  {slug:<26} {'vector':>9}  "
+                  f"{dest.stat().st_size / 1024:6.0f} KB   <- {name}")
+            continue
+
         with Image.open(src) as img:
             img = ImageOps.exif_transpose(img)
             if max(img.size) > LOGO_MAX:
@@ -322,7 +335,7 @@ def main():
     sponsors = build_sponsors()
 
     assert len(headshots) == 24, f"expected 24 headshots, wrote {len(headshots)}"
-    assert len(sponsors) == 9, f"expected 9 sponsor logos, wrote {len(sponsors)}"
+    assert len(sponsors) == 11, f"expected 11 sponsor logos, wrote {len(sponsors)}"
 
     (OUT / "manifest.json").write_text(
         json.dumps({"logo": logo, "heroes": heroes, "headshots": headshots,
@@ -330,7 +343,7 @@ def main():
     )
 
     total = sum(p.stat().st_size for p in OUT.rglob("*") if p.is_file())
-    print(f"\nOK — 24 headshots, 9 sponsor logos, 1 main logo.")
+    print(f"\nOK — 24 headshots, 11 sponsor logos, 1 main logo.")
     print(f"Total images/ size: {total / 1024 / 1024:.2f} MB")
 
 

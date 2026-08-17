@@ -433,8 +433,8 @@ SESSIONS = [
         "label": "Session 1A",
         "room": STAR,
         "time": "10:10 – 10:55",
-        "title": "The State of Fundraising in South Africa: Trends, Compliance, and "
-                 "What's Coming",
+        "title": "The State of Fundraising in South Africa Panel: Trends, Compliance, "
+                 "and What's Coming",
         "speakers": [("delphino-machikicho", "Moderator"), ("jenni-mcleod", None),
                      ("sophie-olivier", None), ("farida-lavangee", None),
                      ("nick-rockey", None)],
@@ -642,16 +642,17 @@ SCHEDULE = [
 
 TOPICS = {
     "opening-plenary": ["Philanthropy"],
-    "session-1a": ["Fundraising Practice"],
+    "session-1a": ["Individual Giving", "Grants & Foundations",
+                   "Compliance & Accounting", "Corporate Social Investment"],
     "session-1b": ["Technology & AI"],
-    "session-2a": ["Fundraising Practice", "Community & Storytelling"],
-    "session-2b": ["Funders & Partnerships"],
-    "session-3a": ["Funders & Partnerships"],
+    "session-2a": ["Crowdfunding", "Peer-to-Peer", "Storytelling"],
+    "session-2b": ["Corporate Social Investment"],
+    "session-3a": ["Grants & Foundations", "Corporate Social Investment"],
     "session-3b": ["Leadership & Strategy"],
-    "session-4a": ["Social Enterprise & Finance"],
-    "session-4b": ["Fundraising Practice"],
+    "session-4a": ["Social Enterprise"],
+    "session-4b": ["Recurring Donors", "Individual Giving"],
     "session-5a": ["Impact & Measurement"],
-    "session-5b": ["Community & Storytelling"],
+    "session-5b": ["Storytelling", "Social Media"],
     "closing-plenary": ["Leadership & Strategy"],
 }
 
@@ -686,27 +687,21 @@ INFO_BLOCKS = [
         "heading": "How to get there",
         "body": ["The Homecoming Centre, corner of Buitenkant and Caledon Street "
                  "(entrance on Caledon Street), District Six, Cape Town 7785.",
-                 "Cape Town Station is about a 10-minute walk away."],
+                 "You can also take the train — Cape Town Station is about a 10-minute "
+                 "walk away."],
         "links": [
             {"label": "Google Maps",
              "url": f"https://www.google.com/maps/search/?api=1&query={VENUE_Q}"},
             {"label": "Apple Maps", "url": f"https://maps.apple.com/?q={VENUE_Q}"},
-            {"label": "Train & transit times",
-             "url": f"https://www.google.com/maps/dir/?api=1&destination={VENUE_Q}"
-                    "&travelmode=transit"},
+            {"label": "Train schedule", "url": "https://cttrains.co.za/train-form.php"},
         ],
     },
     {
         "heading": "Parking",
         "body": ["Paid parking is available at Harrington Square Parking Lot, "
-                 "27 Caledon Street, District Six, Cape Town 7925.",
-                 "There is also some street parking in the surrounding blocks, though it "
-                 "fills up early."],
-        "links": [
-            {"label": "Google Maps",
-             "url": f"https://www.google.com/maps/search/?api=1&query={PARKING_Q}"},
-            {"label": "Apple Maps", "url": f"https://maps.apple.com/?q={PARKING_Q}"},
-        ],
+                 "27 Caledon Street.",
+                 "There is paid street parking in the surrounding blocks. Canterbury "
+                 "Street is free, but it fills up early."],
     },
     {
         "heading": "What to bring",
@@ -717,7 +712,7 @@ INFO_BLOCKS = [
     {
         "heading": "Get social",
         "html": 'Follow <a href="https://www.linkedin.com/company/ifc-cape-town/" '
-                'target="_blank" rel="noopener">the IFC Cape Town Pop-Up</a>, '
+                'target="_blank" rel="noopener">IFC Cape Town Pop-Up</a>, '
                 '<a href="https://www.linkedin.com/company/the-resource-alliance/" '
                 'target="_blank" rel="noopener">The Resource Alliance</a> and '
                 '<a href="https://www.linkedin.com/company/charity-careers-africa/" '
@@ -769,4 +764,10 @@ SPONSORS = [
      "file": "matogen.png", "w": 600, "h": 118},
     {"name": "Weaver Network", "url": "https://weaver-network.org/",
      "file": "weaver-network.png", "w": 600, "h": 155},
+    # "tall": stacked or square lockups, not wide wordmarks. They get a higher
+    # max-height so they do not read as half the size of everything else.
+    {"name": "Homecoming Centre", "url": "https://www.homecomingcentre.com/",
+     "file": "homecoming-centre.png", "w": 600, "h": 431, "tall": True},
+    {"name": "Cooktastic", "url": "https://cooktastic.co.za/",
+     "file": "cooktastic.svg", "w": 500, "h": 500, "tall": True},
 ]

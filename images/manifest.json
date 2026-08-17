@@ -139,6 +139,11 @@
       "h": 137,
       "w": 600
     },
+    "cooktastic": {
+      "file": "cooktastic.svg",
+      "h": null,
+      "w": null
+    },
     "donorbox": {
       "file": "donorbox.png",
       "h": 104,
@@ -153,6 +158,11 @@
       "file": "fundraising-beyond-borders.webp",
       "h": 50,
       "w": 200
+    },
+    "homecoming-centre": {
+      "file": "homecoming-centre.png",
+      "h": 431,
+      "w": 600
     },
     "lifebrand": {
       "file": "lifebrand.webp",

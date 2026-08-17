@@ -192,6 +192,7 @@ header{
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   padding:12px 14px;min-width:0;
 }
+.card.clickable{cursor:pointer}
 .card.star,.card.plenary{border-left:3px solid var(--orange)}
 .card.avalon{border-left:3px solid var(--orange)}
 .card.break,.card.logistics,.card.remarks{border-left:3px solid var(--line-strong)}
@@ -200,8 +201,8 @@ header{
   font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;
   color:var(--orange);display:block;margin-bottom:5px;
 }
-.card .title{display:block;font-weight:600;font-size:.97rem;line-height:1.35;
-  color:var(--text);margin:0 0 6px}
+.card .title{display:block;font-weight:700;font-size:.92rem;line-height:1.35;
+  color:var(--text);margin:0 0 6px;text-transform:uppercase;letter-spacing:.02em}
 a.title:hover{color:var(--orange);text-decoration:none}
 a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
 .card .who{font-size:.87rem;color:var(--text);margin:0;line-height:1.5}
@@ -294,6 +295,7 @@ a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
   scroll-margin-top:calc(var(--nav-h) + 14px);
   transition:border-color .15s, background-color .15s;
 }
+.spk{cursor:pointer}
 .spk:hover{border-color:var(--orange);background:var(--surface-2)}
 .spk img{
   width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:50% 50%;
@@ -338,7 +340,7 @@ html:not(.js) .learn-btn{display:none}
   /* Keep the card clear of the phone browser's URL bar, or the close button
      ends up underneath it and is nearly untappable. */
   padding:calc(84px + env(safe-area-inset-top)) 0 0}
-@media (min-width:640px){.modal{align-items:center;padding:24px}}
+@media (min-width:640px){.modal{align-items:center;padding:88px 24px 24px}}
 .modal-backdrop{position:absolute;inset:0;background:rgba(16,17,26,.72);
   backdrop-filter:blur(3px)}
 .modal-card{
@@ -386,7 +388,7 @@ html.modal-open,html.modal-open body{overflow:hidden}
 
 /* ---------- back pill ---------- */
 #backpill{
-  position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:70;
+  position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:100;
   display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 20px;
   border-radius:999px;border:1px solid rgba(0,0,0,.2);
   background:var(--orange);color:#241f10;font-family:inherit;font-weight:700;
@@ -394,6 +396,11 @@ html.modal-open,html.modal-open body{overflow:hidden}
   text-transform:uppercase;letter-spacing:.04em;
 }
 #backpill:hover{background:#ffa61f}
+/* With a profile open, the pill moves into the empty strip above the card, so
+   it stays reachable without covering the card's own content. */
+html.modal-open #backpill{
+  bottom:auto;top:calc(env(safe-area-inset-top) + 18px);
+}
 
 /* ---------- on-the-day info ---------- */
 .info-when{
@@ -441,25 +448,32 @@ html.modal-open,html.modal-open body{overflow:hidden}
 .sponsors-wrap h2{
   margin:0 0 22px;text-align:center;font-size:.95rem;color:#303249;letter-spacing:.06em;
 }
+/* Centred flex rather than a fixed grid: the last row centres itself whatever
+   the sponsor count is, so adding one does not leave a ragged row. */
 .sponsors{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:6px 4px;list-style:none;margin:0;padding:0 16px;
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;
+  gap:4px;list-style:none;margin:0;padding:0 12px;
 }
+.sponsors li{flex:0 0 calc(50% - 4px);display:flex}
 @media (min-width:640px){
-  .sponsors{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 10px;padding:0 28px}
+  .sponsors{gap:10px;padding:0 24px}
+  .sponsors li{flex:0 0 calc(33.333% - 10px)}
 }
-/* Odd one out on a 2-column phone layout: centre it across both columns. */
-.sponsors li:last-child{grid-column:1 / -1}
-@media (min-width:640px){.sponsors li:last-child{grid-column:auto}}
+@media (min-width:900px){.sponsors li{flex:0 0 calc(25% - 10px)}}
 .sponsors a{
-  display:flex;align-items:center;justify-content:center;
-  min-height:78px;padding:10px 12px;border-radius:8px;
+  flex:1;display:flex;align-items:center;justify-content:center;
+  min-height:92px;padding:10px 12px;border-radius:8px;
 }
-@media (min-width:640px){.sponsors a{min-height:92px;padding:12px 16px}}
+@media (min-width:640px){.sponsors a{min-height:110px;padding:14px 16px}}
 .sponsors a:hover{background:#F2F3F8;text-decoration:none}
 .sponsors a:focus-visible{outline:3px solid var(--orange);outline-offset:-2px}
-.sponsors img{max-height:44px;max-width:100%;width:auto;height:auto;display:block}
-@media (min-width:640px){.sponsors img{max-height:52px}}
+/* Wide wordmarks hit the width cap; the stacked (Homecoming Centre) and square
+   (Cooktastic) logos hit the height cap, so it has to be generous or they end up
+   a third the size of everything else. */
+.sponsors img{max-height:56px;max-width:100%;width:auto;height:auto;display:block}
+@media (min-width:640px){.sponsors img{max-height:66px}}
+.sponsors a.tall img{max-height:82px}
+@media (min-width:640px){.sponsors a.tall img{max-height:96px}}
 
 footer{
   border-top:1px solid var(--line);padding:38px 0 36px;
@@ -468,14 +482,9 @@ footer{
 /* Needs to out-specify .wrap's "margin:0 auto", which would zero this out. */
 footer.wrap{margin-top:44px}
 footer p{margin:0 0 10px}
-footer .foot-cta{margin:0 0 18px}
-footer .foot-cta a{
-  display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 24px;
-  border-radius:999px;background:var(--orange);color:#241f10;
-  font-weight:700;font-size:.88rem;text-transform:uppercase;letter-spacing:.05em;
-}
-footer .foot-cta a:hover{background:#ffa61f;text-decoration:none}
-footer .foot-cta svg{width:13px;height:13px;fill:currentColor}
+footer .tickets{color:var(--orange);font-weight:700;text-decoration:underline;
+  text-underline-offset:2px}
+footer .tickets:hover{color:#ffa61f}
 footer .credit{font-size:.78rem;opacity:.8}
 footer .credit a{color:var(--muted);text-decoration:underline}
 footer .credit a:hover{color:var(--orange)}
@@ -580,9 +589,20 @@ JS = """
   document.addEventListener('click', function(ev){
     var t = ev.target;
     if(!t || !t.closest) return;
+    if(t.closest('[data-close]')){ ev.preventDefault(); closeModal(); return; }
     var btn = t.closest('.learn-btn');
     if(btn){ openModal(btn.closest('.spk')); return; }
-    if(t.closest('[data-close]')){ ev.preventDefault(); closeModal(); }
+    // Anywhere on a speaker card opens the profile — except the real links on it
+    // (LinkedIn, and the session title), which do their own thing.
+    var card = t.closest('.spk');
+    if(card && !t.closest('a')){ openModal(card); return; }
+    // Same for a schedule box: tapping it anywhere opens that session. Delegates
+    // to the title link so the tab-switch, history and back-pill logic is shared.
+    var slot = t.closest('.card.clickable');
+    if(slot && !t.closest('a')){
+      var link = slot.querySelector('a.title');
+      if(link) link.click();
+    }
   });
   document.addEventListener('keydown', function(ev){
     if(!modalOpen()) return;
@@ -776,6 +796,7 @@ def render_schedule_item(item, room_class=None, room_label=None):
 
     if "session" in item:
         s = BY_ANCHOR[item["session"]]
+        classes.append("clickable")
         if item.get("flavour") == "plenary" or s.get("plenary"):
             classes.append("plenary")
         # Full-width plenaries keep their "OPENING PLENARY · STAR THEATRE" kicker.
@@ -1082,14 +1103,9 @@ def render_page():
 {render_sponsors()}
 </main>
 <footer class="wrap">
-  <p class="foot-cta">
-    <a href="{e(ev['tickets_url'])}" target="_blank" rel="noopener">
-      Get Your Tickets {EXT_SVG}</a>
-  </p>
-  <p><b>{e(ev['name'])}</b> &middot; {e(ev['date'])} &middot; {e(ev['venue'])}</p>
-  <p class="credit">Event photography by
-    <a href="{e(D.PHOTO_CREDIT['url'])}" target="_blank" rel="noopener">
-      {e(D.PHOTO_CREDIT['name'])}</a></p>
+  <p><b>{e(ev['name'])}</b> &middot; {e(ev['date'])} &middot; {e(ev['venue'])}
+    &middot; <a class="tickets" href="{e(ev['tickets_url'])}" target="_blank"
+      rel="noopener">Get Your Tickets</a></p>
   <p class="credit">Tool made using AI vibe-coding by
     <a href="https://shawnlife.com" target="_blank" rel="noopener">ShawnLife</a></p>
 </footer>

@@ -1151,6 +1151,16 @@ def render_page():
     desc = (f"{ev['name']} — {ev['date']}, {ev['venue']}. "
             "Full programme, sessions and speakers.")
 
+    # Read the real dimensions off the card rather than hardcoding them: the
+    # supplied artwork may be any ratio, and wrong og:image:width/height makes
+    # some scrapers lay the preview out badly.
+    try:
+        from PIL import Image
+        with Image.open(ROOT / "assets" / "images" / "social-card.jpg") as _c:
+            card_w, card_h = _c.size
+    except Exception:
+        card_w, card_h = 1200, 630
+
     # The hero is a CSS background, so it is discovered late. Preloading the size
     # that will actually be used keeps it as a fast LCP element.
     preload = ""
@@ -1175,8 +1185,8 @@ def render_page():
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{SITE_URL}">
 <meta property="og:image" content="{SITE_URL}assets/images/social-card.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="{card_w}">
+<meta property="og:image:height" content="{card_h}">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:alt" content="{e(ev['name'])} — {e(ev['date'])}">
 <meta property="og:site_name" content="{e(ev['name'])}">

@@ -26,6 +26,11 @@ LOGO = ROOT / "assets" / "images" / "logo.png"
 FONTS = ROOT / "source" / "fonts-graphik"
 OUT = ROOT / "assets" / "images" / "social-card.jpg"
 
+# A hand-designed card dropped in here wins over the generated one. Any image
+# format PIL reads; it gets resized and compressed to fit the size budget.
+SUPPLIED_DIR = ROOT / "source" / "social"
+SUPPLIED_WIDTHS = (1600, 1200, 1000)
+
 W, H = 1200, 630          # 1.91:1, the standard Open Graph size
 NAVY = (48, 50, 73)
 ORANGE = (244, 148, 4)
@@ -60,7 +65,55 @@ def font(size, weight="Bold"):
     return ImageFont.load_default()
 
 
+def save_within_budget(img, widths):
+    """Shrink and re-encode until the file fits MAX_KB, largest version first."""
+    for w in widths:
+        v = img if img.width <= w else img.resize(
+            (w, round(img.height * w / img.width)), Image.LANCZOS)
+        for quality in (86, 80, 74, 68, 62):
+            v.save(OUT, "JPEG", quality=quality, optimize=True, progressive=True)
+            kb = OUT.stat().st_size / 1024
+            if kb <= MAX_KB:
+                return v.size, kb, quality
+    return v.size, kb, quality
+
+
+def use_supplied():
+    """Publish a supplied card if there is one. Returns True if it did."""
+    if not SUPPLIED_DIR.exists():
+        return False
+    files = sorted(f for f in SUPPLIED_DIR.iterdir()
+                   if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"})
+    if not files:
+        return False
+    src = files[0]
+    # Flatten any alpha onto navy: a transparent share image renders as a white
+    # block in WhatsApp, which is what went wrong the first time round.
+    img = Image.open(src)
+    if img.mode in ("RGBA", "LA", "P"):
+        flat = Image.new("RGB", img.size, NAVY)
+        img = img.convert("RGBA")
+        flat.paste(img, mask=img.split()[-1])
+        img = flat
+    else:
+        img = img.convert("RGB")
+
+    ratio = img.width / img.height
+    size, kb, quality = save_within_budget(img, SUPPLIED_WIDTHS)
+    print(f"Wrote {OUT.relative_to(ROOT)} from {src.name}")
+    print(f"  {size[0]}x{size[1]}  {kb:.0f} KB  quality {quality}  ratio {ratio:.2f}:1")
+    if not 1.7 <= ratio <= 2.0:
+        print(f"  ! ratio {ratio:.2f}:1 is outside the 1.78-1.91 range platforms like;"
+              " it may be cropped.")
+    if kb > MAX_KB:
+        sys.exit(f"  ! still over {MAX_KB}KB — WhatsApp may skip it.")
+    return True
+
+
 def main():
+    if use_supplied():
+        return
+
     card = Image.new("RGB", (W, H), NAVY)
 
     # Hero photo, cropped to fill, then dimmed so white type stays readable.

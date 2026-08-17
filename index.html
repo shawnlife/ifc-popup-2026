@@ -511,7 +511,58 @@ footer .credit a:hover{color:var(--orange)}
 (function(){
   var root = document.documentElement;
   root.classList.add('js');
-  function track(){}   /* usage tracking not configured */
+
+  /* ------------- usage tracking: aggregate counts, no identifiers -------------
+     Buffers events and flushes on a timer and on page-hide, so a visitor tapping
+     round the schedule costs a handful of requests rather than one per tap.
+     The session id is random and lives in memory only — never stored, so it
+     resets on reload and identifies nobody. */
+  var TRACK_URL = 'https://script.google.com/macros/s/AKfycbyCEpldevM42xqC-mcW8ar1WENK8HTlN1QmhYpVQUYbzfmgALZp5rVu4M8ss7rUKOXR/exec';
+  var tq = [], tsid = Math.random().toString(36).slice(2, 10), ttimer = null;
+  function flushTrack(){
+    if(ttimer){ clearTimeout(ttimer); ttimer = null; }
+    if(!tq.length) return;
+    var body = JSON.stringify({ sid: tsid, events: tq });
+    tq = [];
+    try { if(navigator.sendBeacon && navigator.sendBeacon(TRACK_URL, body)) return; }
+    catch(err){}
+    try { fetch(TRACK_URL, { method:'POST', mode:'no-cors', keepalive:true, body:body }); }
+    catch(err){}
+  }
+  function track(type, target){
+    tq.push({ t: Date.now(), type: type, target: String(target || '').slice(0, 80) });
+    if(tq.length >= 12){ flushTrack(); return; }
+    if(!ttimer) ttimer = setTimeout(flushTrack, 5000);
+  }
+  window.addEventListener('pagehide', flushTrack);
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'hidden') flushTrack();
+  });
+  // Every outbound link is recorded, labelled by what the visitor actually saw
+  // (link text, or a sponsor logo's alt text), so "did anyone click the train
+  // schedule / a sponsor / ShawnLife" is answerable.
+  function outLabel(a){
+    var t = (a.textContent || '').replace(/\s+/g, ' ').trim();
+    if(!t){ var img = a.querySelector('img'); t = img ? (img.alt || '') : ''; }
+    if(!t){ try { t = new URL(a.href).hostname; } catch(err){ t = a.href; } }
+    return t;
+  }
+  document.addEventListener('click', function(ev){
+    var a = ev.target && ev.target.closest ? ev.target.closest('a[href^="http"]') : null;
+    if(!a) return;
+    if(a.href.indexOf('qkt.io') > -1){ track('ticket', ''); return; }
+    if(a.classList.contains('li')){
+      // Record whose profile, not the word "LinkedIn".
+      var card = a.closest('.spk');
+      var who = card ? card.getAttribute('data-name')
+        : (document.getElementById('modal-name').textContent || '').trim();
+      track('linkedin', who);
+      return;
+    }
+    track('outbound', outLabel(a));
+  });
+  track('visit', '');
+
 
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role=tab]'));
   if(!tabs.length) return;

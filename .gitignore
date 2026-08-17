@@ -17,3 +17,8 @@ __pycache__/
 # Graphik trial weights from befonts.com — licence reads "Personal Use Only",
 # which does not cover a public sponsored event site. Local preview only.
 /graphik-font-family/
+
+# Original logo artwork. Sources only — build_images.py turns these into the
+# slug-named copies in images/sponsors/. Keeping them out of images/ stops
+# originals being shipped to the live site by accident.
+/source-logos/

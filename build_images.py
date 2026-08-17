@@ -20,6 +20,10 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).parent
 HEADSHOT_SRC = ROOT / "Headshots"
+# Original logos live here, mirroring Headshots/. They used to sit loose in the
+# project root, which made it easy to drop copies into images/sponsors/ by
+# mistake and ship them. Sources in, generated files out — never mixed.
+LOGO_SRC = ROOT / "source-logos"
 OUT = ROOT / "images"
 OUT_HEADSHOTS = OUT / "headshots"
 OUT_SPONSORS = OUT / "sponsors"
@@ -75,12 +79,12 @@ MANUAL_CROP = {}
 
 SPONSORS = {
     "0924974_0.webp": "resource-alliance",
-    "CCA.webp": "cca",
+    "CCA copy.webp": "cca",
     "FBB.webp": "fundraising-beyond-borders",
     "DB.png": "donorbox",
     "DMI.webp": "downes-murray",
     "TPCA.webp": "turning-point",
-    "LIFEBrand.webp": "lifebrand",
+    "LIFEBrand copy.webp": "lifebrand",
     "Matogen_Digital_Logo.png": "matogen",
     "Weaver logo Dark.png": "weaver-network",
     "HCC Logo Stacked.png": "homecoming-centre",
@@ -212,9 +216,21 @@ def square_crop_on_face(img, face):
 
 
 def build_headshots():
+    already = {f'{slug}.jpg' for slug in HEADSHOTS.values()
+               if (OUT_HEADSHOTS / f"{slug}.jpg").exists()}
+    if not HEADSHOT_SRC.exists() and len(already) == len(HEADSHOTS):
+        # Source photos are large and live outside git, so they go walkabout.
+        # If every web copy is already built, carry on rather than blocking a
+        # logo or hero rebuild for want of originals nothing currently needs.
+        print(f"  ! {HEADSHOT_SRC.name}/ not found — keeping the "
+              f"{len(already)} existing web copies.")
+        print("    Restore the folder to re-crop or add a photo.")
+        return {slug: None for slug in HEADSHOTS.values()}
+
     missing = [n for n in HEADSHOTS if not (HEADSHOT_SRC / n).exists()]
     if missing:
-        sys.exit("Missing headshot source files:\n  " + "\n  ".join(missing))
+        sys.exit(f"Missing headshot source files in {HEADSHOT_SRC.name}/:\n  "
+                 + "\n  ".join(missing))
 
     manifest = {}
     undetected = []
@@ -257,13 +273,13 @@ def build_headshots():
 
 
 def build_sponsors():
-    missing = [n for n in SPONSORS if not (ROOT / n).exists()]
+    missing = [n for n in SPONSORS if not (LOGO_SRC / n).exists()]
     if missing:
         sys.exit("Missing sponsor logo source files:\n  " + "\n  ".join(missing))
 
     manifest = {}
     for name, slug in sorted(SPONSORS.items(), key=lambda kv: kv[1]):
-        src = ROOT / name
+        src = LOGO_SRC / name
         ext = src.suffix.lower()
         dest = OUT_SPONSORS / f"{slug}{ext}"
 
@@ -328,7 +344,7 @@ def build_heroes():
 
 
 def build_main_logo():
-    src = ROOT / MAIN_LOGO
+    src = LOGO_SRC / MAIN_LOGO
     if not src.exists():
         sys.exit(f"Missing main logo: {MAIN_LOGO}")
     with Image.open(src) as img:

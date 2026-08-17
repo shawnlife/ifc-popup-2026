@@ -741,7 +741,7 @@ INFO_OUTRO = "We are looking forward to seeing you on Wednesday, 2 September."
 # and filters get used, ticket clicks. No cookies, no localStorage, no IP
 # logging, no demographics — so the site still needs no consent banner.
 # ---------------------------------------------------------------------------
-ANALYTICS_URL = None
+ANALYTICS_URL = ("https://script.google.com/macros/s/AKfycbyCEpldevM42xqC-mcW8ar1WENK8HTlN1QmhYpVQUYbzfmgALZp5rVu4M8ss7rUKOXR/exec")
 
 
 # Split so the plain address never appears as a single string in the HTML.

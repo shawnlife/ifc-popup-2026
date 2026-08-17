@@ -732,6 +732,18 @@ INFO_BLOCKS = [
 
 INFO_OUTRO = "We are looking forward to seeing you on Wednesday, 2 September."
 
+# ---------------------------------------------------------------------------
+# Usage tracking. Paste the deployed Apps Script web-app URL here to switch it
+# on; leave as None and no tracking code is emitted into index.html at all.
+# See analytics/SETUP.md.
+#
+# What it records: which sessions and speaker profiles get opened, which tabs
+# and filters get used, ticket clicks. No cookies, no localStorage, no IP
+# logging, no demographics — so the site still needs no consent banner.
+# ---------------------------------------------------------------------------
+ANALYTICS_URL = None
+
+
 # Split so the plain address never appears as a single string in the HTML.
 CONTACT_EMAIL_USER = "shawnlifebiz"
 CONTACT_EMAIL_HOST = "gmail.com"

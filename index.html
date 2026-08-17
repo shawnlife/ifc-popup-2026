@@ -505,6 +505,7 @@ footer .credit a:hover{color:var(--orange)}
 (function(){
   var root = document.documentElement;
   root.classList.add('js');
+  function track(){}   /* usage tracking not configured */
 
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role=tab]'));
   if(!tabs.length) return;
@@ -579,6 +580,7 @@ footer .credit a:hover{color:var(--orange)}
       ? '<span class="badge intl">International Speaker</span>' : '';
     mBody.innerHTML = detail ? detail.innerHTML : '';
     mLi.href = card.getAttribute('data-linkedin');
+    track('speaker', card.id);
     lastFocus = document.activeElement;
     modal.hidden = false;
     root.classList.add('modal-open');
@@ -629,6 +631,7 @@ footer .credit a:hover{color:var(--orange)}
     var p = panelOf(target);
     if(!p) return;
     if(p !== currentPanel()) activate(p.id);
+    if(target.classList.contains('session')) track('session', target.id);
     target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'start' });
     if(withModal && target.classList.contains('spk')){
       setTimeout(function(){ openModal(target); }, reduce ? 0 : 260);
@@ -640,6 +643,7 @@ footer .credit a:hover{color:var(--orange)}
   tabs.forEach(function(tab, i){
     tab.addEventListener('click', function(ev){
       ev.preventDefault();
+      track('tab', tab.getAttribute('data-label'));
       closeModal();
       activate(tab.getAttribute('aria-controls'));
       hidePill();
@@ -730,7 +734,9 @@ footer .credit a:hover{color:var(--orange)}
   var selects = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
   selects.forEach(function(sel){
     sel.addEventListener('change', function(){
-      state[sel.getAttribute('data-filter')] = sel.value;
+      var key = sel.getAttribute('data-filter');
+      state[key] = sel.value;
+      track('filter', key + ':' + sel.value);
       applyFilters();
     });
   });

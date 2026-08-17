@@ -1027,7 +1027,7 @@ def render_speakers():
             f'<article class="spk" id="{sp["slug"]}" tabindex="-1" '
             f'data-name="{e(sp["name"])}" data-role="{e(sp["title"])}" '
             f'data-org="{e(sp["org"])}" data-linkedin="{e(sp["linkedin"])}" '
-            f'data-img="images/headshots/{sp["slug"]}.jpg" '
+            f'data-img="assets/images/headshots/{sp["slug"]}.jpg" '
             f'data-intl="{"1" if sp.get("international") else "0"}">'
             f'<img src="assets/images/headshots/{sp["slug"]}.jpg" width="120" height="120" '
             f'loading="lazy" decoding="async" alt="{e(sp["name"])}">'

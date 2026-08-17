@@ -1,0 +1,15 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+# Original photos and logos: ~72MB, kept on Shawn's Desktop only.
+# build_images.py turns these into the small copies in images/.
+/Headshots/
+/*.webp
+/*.JPG
+/*.jpg
+/*.jpeg
+/Pop-Up Cape Town logo white no shadow.png
+/Weaver logo Dark.png
+/Matogen_Digital_Logo.png
+/DB.png

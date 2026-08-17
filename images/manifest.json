@@ -1,0 +1,151 @@
+{
+  "headshots": {
+    "alison-young": [
+      403,
+      600
+    ],
+    "angela-blackwell": [
+      599,
+      600
+    ],
+    "casey-prince": [
+      240,
+      262
+    ],
+    "chantel-cooper": [
+      600,
+      568
+    ],
+    "cheryl-manikam": [
+      512,
+      600
+    ],
+    "colleen-francis": [
+      487,
+      600
+    ],
+    "damian-chapman": [
+      400,
+      600
+    ],
+    "delphino-machikicho": [
+      600,
+      509
+    ],
+    "farida-lavangee": [
+      534,
+      600
+    ],
+    "ian-parsons": [
+      600,
+      600
+    ],
+    "jenni-mcleod": [
+      600,
+      400
+    ],
+    "leana-de-beer": [
+      543,
+      600
+    ],
+    "malusi-ntoyapi": [
+      600,
+      600
+    ],
+    "miche-nicholas": [
+      438,
+      600
+    ],
+    "mide-akerewusi": [
+      401,
+      600
+    ],
+    "nick-rockey": [
+      600,
+      600
+    ],
+    "nomsa-muthaphuli": [
+      600,
+      600
+    ],
+    "nondumiso-mabuya": [
+      600,
+      576
+    ],
+    "phano-liphoto": [
+      599,
+      600
+    ],
+    "reana-rossouw": [
+      400,
+      600
+    ],
+    "roland-postma": [
+      600,
+      600
+    ],
+    "shona-young": [
+      600,
+      600
+    ],
+    "sophie-olivier": [
+      400,
+      600
+    ],
+    "toni-erasmus": [
+      400,
+      600
+    ]
+  },
+  "logo": [
+    800,
+    620
+  ],
+  "sponsors": {
+    "cca": {
+      "file": "cca.webp",
+      "h": 137,
+      "w": 600
+    },
+    "donorbox": {
+      "file": "donorbox.png",
+      "h": 104,
+      "w": 485
+    },
+    "downes-murray": {
+      "file": "downes-murray.webp",
+      "h": 133,
+      "w": 600
+    },
+    "fundraising-beyond-borders": {
+      "file": "fundraising-beyond-borders.webp",
+      "h": 50,
+      "w": 200
+    },
+    "lifebrand": {
+      "file": "lifebrand.webp",
+      "h": 126,
+      "w": 600
+    },
+    "matogen": {
+      "file": "matogen.png",
+      "h": 118,
+      "w": 600
+    },
+    "resource-alliance": {
+      "file": "resource-alliance.webp",
+      "h": 282,
+      "w": 600
+    },
+    "turning-point": {
+      "file": "turning-point.webp",
+      "h": 148,
+      "w": 586
+    },
+    "weaver-network": {
+      "file": "weaver-network.png",
+      "h": 155,
+      "w": 600
+    }
+  }
+}

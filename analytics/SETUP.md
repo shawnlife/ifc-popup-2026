@@ -97,6 +97,13 @@ The chart has three views — **Hourly** (last 48 hours), **Daily**, and
 **Event day** (07:00–18:00 on 2 September). If the event date ever moves, change
 `EVENT_DAY` near the top of the dashboard's script.
 
+### Testing the live site without polluting your own data
+
+Open `https://ifc.shawnlife.com/?shawn` instead of the plain URL. Tracking is
+suppressed for the whole visit — switching tabs, opening profiles, using
+filters, all of it — nothing is sent. This also covers any manual QA of the
+live site; use the `?shawn` link rather than the plain one.
+
 If the browser blocks it from a `file://` page, run this in the `analytics`
 folder and open <http://localhost:8000/dashboard.html>:
 

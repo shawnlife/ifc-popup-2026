@@ -515,17 +515,31 @@ TRACK_JS = """
      resets on reload and identifies nobody. */
   var TRACK_URL = '__TRACK_URL__';
   var tq = [], tsid = Math.random().toString(36).slice(2, 10), ttimer = null;
+
+  // ?shawn on the URL (or in a previous history entry this tab visited, since
+  // switching tabs rewrites the URL via pushState) suppresses tracking, so
+  // Shawn's own browsing — and anyone's manual QA of the live site — never
+  // pollutes real usage data. Persisted in sessionStorage so it survives
+  // navigating around after landing on the ?shawn link.
+  var PREVIEW = /[?&]shawn(?:&|=|$)/.test(location.search);
+  try {
+    if(PREVIEW) sessionStorage.setItem('ifc_preview', '1');
+    else if(sessionStorage.getItem('ifc_preview') === '1') PREVIEW = true;
+  } catch(err){ /* private browsing: falls back to the URL check above only */ }
+
   function flushTrack(){
     if(ttimer){ clearTimeout(ttimer); ttimer = null; }
     if(!tq.length) return;
     var body = JSON.stringify({ sid: tsid, events: tq });
     tq = [];
+    if(PREVIEW) return;   // drop the batch — preview mode never sends
     try { if(navigator.sendBeacon && navigator.sendBeacon(TRACK_URL, body)) return; }
     catch(err){}
     try { fetch(TRACK_URL, { method:'POST', mode:'no-cors', keepalive:true, body:body }); }
     catch(err){}
   }
   function track(type, target){
+    if(PREVIEW) return;
     tq.push({ t: Date.now(), type: type, target: String(target || '').slice(0, 80) });
     if(tq.length >= 12){ flushTrack(); return; }
     if(!ttimer) ttimer = setTimeout(flushTrack, 5000);

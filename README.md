@@ -110,6 +110,11 @@ written into the page at all.
 `analytics/dashboard.html` is the local dashboard — open it, click **Change
 URL**, paste the Apps Script `/exec` URL. Refreshes every 60 seconds.
 
+**Browsing the live site yourself?** Use
+`https://ifc.shawnlife.com/?shawn` — that suppresses tracking entirely for
+that browser tab (and any tab it navigates to next), so your own clicks never
+land in the Sheet. Nothing is sent, not even a marked "ignore this" event.
+
 ## The QR code for the day
 
 `qr/ifc-popup-2026-qr-print-A5.png` is print-ready at A5, 300dpi. Both files were

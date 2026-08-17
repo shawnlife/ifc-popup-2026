@@ -127,12 +127,37 @@ header{
 .panel-sub{margin:0 0 20px;color:var(--muted);font-size:.92rem}
 
 /* ---------- hero ---------- */
-.hero{text-align:center;padding:14px 0 28px}
+.hero{
+  position:relative;text-align:center;
+  padding:34px 18px 38px;margin-bottom:6px;
+  border-radius:16px;overflow:hidden;background:var(--bg);
+}
+/* The photo sits behind a navy scrim so white text stays legible over it and
+   the bottom edge fades into the page. Phones get the 900px file. */
+.hero.has-photo::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  background-image:
+    linear-gradient(180deg, rgba(35,37,55,.62) 0%, rgba(38,40,59,.78) 55%,
+                    rgba(48,50,73,.96) 100%),
+    var(--hero-sm);
+  background-size:cover;background-position:center 38%;
+}
+@media (min-width:900px){
+  .hero.has-photo::before{background-image:
+    linear-gradient(180deg, rgba(35,37,55,.62) 0%, rgba(38,40,59,.78) 55%,
+                    rgba(48,50,73,.96) 100%),
+    var(--hero-lg);}
+}
+.hero > *{position:relative;z-index:1}
+.hero.has-photo{padding:44px 18px 46px}
+.hero.has-photo h1,.hero.has-photo .meta{text-shadow:0 2px 14px rgba(0,0,0,.5)}
 .hero img{width:min(260px,68vw);height:auto;margin:0 auto 18px;display:block}
+.hero.has-photo img{filter:drop-shadow(0 3px 18px rgba(0,0,0,.5))}
 .hero h1{margin:0 0 12px;font-size:clamp(1.35rem,5.4vw,2.3rem);line-height:1.18}
 .hero .meta{margin:0 auto 22px;color:var(--text);font-size:1rem;max-width:34ch}
 .hero .meta b{display:block;font-size:1.1rem;letter-spacing:.02em}
 .hero .meta span{color:var(--muted)}
+.hero.has-photo .meta span{color:#E4E6F2}
 .cta{
   display:inline-flex;align-items:center;gap:8px;min-height:50px;padding:0 26px;
   border-radius:999px;background:var(--orange);color:#241f10;
@@ -315,6 +340,8 @@ html:not(.js) .learn-btn{display:none}
 #modal-badges:empty{display:none}
 #modal-body{text-align:left;margin-top:18px}
 #modal-body .bio{margin:0;font-size:.92rem;color:var(--text);line-height:1.6}
+#modal-body .bio + .bio{margin-top:12px}
+.spk-detail .bio + .bio{margin-top:10px}
 #modal-body .in-session{margin:0 0 16px;padding:12px 14px;background:rgba(0,0,0,.16);
   border-left:3px solid var(--orange);border-radius:8px;font-size:.88rem}
 #modal-body .in-session .lbl{display:block;color:var(--orange);font-size:.62rem;
@@ -646,6 +673,12 @@ def speaker_links(pairs):
     return out[0] if out else ""
 
 
+def bio_html(bio):
+    """A bio is either one string or a list of paragraphs."""
+    paras = [bio] if isinstance(bio, str) else list(bio)
+    return "".join(f'<p class="bio">{e(p)}</p>' for p in paras)
+
+
 def topic_badges(anchor):
     return "".join(f'<span class="badge topic">{e(t)}</span>' for t in topics_of(anchor))
 
@@ -691,8 +724,14 @@ def render_schedule():
         )
 
     ev, logo = D.EVENT, D.EVENT["logo"]
+    photo = ev.get("hero")
+    hero_cls = "hero has-photo" if photo else "hero"
+    style = ""
+    if photo:
+        style = (f' style="--hero-sm:url(images/hero/{photo}-900.jpg);'
+                 f'--hero-lg:url(images/hero/{photo}-1800.jpg)"')
     hero = f"""
-    <div class="hero">
+    <div class="{hero_cls}"{style}>
       <img src="images/{e(logo['file'])}" width="{logo['w']}" height="{logo['h']}"
            alt="IFC Cape Town Pop-Up 2026">
       <h1>{e(ev['headline'])}</h1>
@@ -796,7 +835,7 @@ def render_speakers():
         detail = ""
         if not pending:
             detail = (f'<div class="spk-detail">{sessions}'
-                      f'<p class="bio">{e(sp["bio"])}</p></div>')
+                      f'{bio_html(sp["bio"])}</div>')
 
         cards.append(
             f'<article class="spk" id="{sp["slug"]}" tabindex="-1" '

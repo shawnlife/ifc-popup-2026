@@ -91,9 +91,17 @@ decoded back to the live URL to confirm they scan.
 python3 make_qr.py https://ifc.shawnlife.com/
 ```
 
+## Hero background
+
+`EVENT["hero"]` in `site_data.py` picks the photo behind the logo. Options are
+the slugs in `HEROES` in `build_images.py` — `theatre-blue`, `stage-amber`,
+`audience` — or `None` for plain navy. All three are already built at two widths
+(phones load the 900px file), so switching is a one-word change plus a rebuild.
+
 ### Still outstanding
 
-- Nomsa Muthaphuli's bio
 - A higher-resolution Fundraising Beyond Borders logo (current is 200×50px)
+- Cooktastic and Homecoming Centre logos to add to the sponsor band
+- "On the day" info (parking etc.) — likely a fourth tab
 - Custom domain (`ifc.shawnlife.com`) — needs a DNS record plus a `CNAME` file,
   and a reprinted QR code

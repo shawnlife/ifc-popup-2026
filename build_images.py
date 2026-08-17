@@ -22,6 +22,7 @@ HEADSHOT_SRC = ROOT / "Headshots"
 OUT = ROOT / "images"
 OUT_HEADSHOTS = OUT / "headshots"
 OUT_SPONSORS = OUT / "sponsors"
+OUT_HERO = OUT / "hero"
 
 HEADSHOT_MAX = 600   # displayed at 120px, so this covers retina with room to spare
 LOGO_MAX = 600
@@ -46,7 +47,7 @@ HEADSHOTS = {
     "Malusi Ntoyapi.jpg": "malusi-ntoyapi",
     "Miche Nicholas Headshot.png": "miche-nicholas",
     "Nick Rockey.png": "nick-rockey",                     # 600x600, best of 3 variants
-    "Nomsa Muthaphuli": "nomsa-muthaphuli",               # supplied with no file extension
+    "Nomsa Muthaphuli.png": "nomsa-muthaphuli",
     "Nondumiso Mabuya.jpg": "nondumiso-mabuya",
     "Olumide Akerewusi Headshot.jpg": "mide-akerewusi",
     "Phano Portrait.jpg": "phano-liphoto",
@@ -84,6 +85,16 @@ SPONSORS = {
 }
 
 MAIN_LOGO = "Pop-Up Cape Town logo white no shadow.png"
+
+# Hero background candidates, shot at the 2025 Pop-Up by LIFEbrand. Two widths
+# each: phones pull the small one, so nobody downloads 1800px over event wifi.
+HEROES = {
+    "IFC Pop Up 2025 @LIFEbrand-6.jpg": "theatre-blue",
+    "IFC Pop Up 2025 @LIFEbrand-13.jpg": "stage-amber",
+    "IFC Pop Up 2025 @LIFEbrand-138.jpg": "audience",
+}
+HERO_WIDTHS = (900, 1800)
+HERO_QUALITY = 72
 
 
 def fit(img, longest):
@@ -253,6 +264,33 @@ def build_sponsors():
     return manifest
 
 
+def build_heroes():
+    missing = [n for n in HEROES if not (ROOT / n).exists()]
+    if missing:
+        print("  (skipping heroes, sources not present: "
+              + ", ".join(missing) + ")")
+        return {}
+
+    OUT_HERO.mkdir(parents=True, exist_ok=True)
+    manifest = {}
+    for name, slug in sorted(HEROES.items(), key=lambda kv: kv[1]):
+        with Image.open(ROOT / name) as img:
+            img = ImageOps.exif_transpose(img)
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            sizes = {}
+            for width in HERO_WIDTHS:
+                v = img if img.width <= width else fit(img, width)
+                dest = OUT_HERO / f"{slug}-{width}.jpg"
+                v.save(dest, "JPEG", quality=HERO_QUALITY, optimize=True,
+                       progressive=True)
+                sizes[width] = [v.width, v.height]
+                print(f"  {dest.name:<28} {v.width:>4}x{v.height:<4} "
+                      f"{dest.stat().st_size / 1024:6.0f} KB")
+            manifest[slug] = sizes
+    return manifest
+
+
 def build_main_logo():
     src = ROOT / MAIN_LOGO
     if not src.exists():
@@ -276,6 +314,8 @@ def main():
 
     print("Main logo:")
     logo = build_main_logo()
+    print("\nHero backgrounds:")
+    heroes = build_heroes()
     print("\nHeadshots:")
     headshots = build_headshots()
     print("\nSponsor logos:")
@@ -285,8 +325,8 @@ def main():
     assert len(sponsors) == 9, f"expected 9 sponsor logos, wrote {len(sponsors)}"
 
     (OUT / "manifest.json").write_text(
-        json.dumps({"logo": logo, "headshots": headshots, "sponsors": sponsors},
-                   indent=2, sort_keys=True)
+        json.dumps({"logo": logo, "heroes": heroes, "headshots": headshots,
+                    "sponsors": sponsors}, indent=2, sort_keys=True)
     )
 
     total = sum(p.stat().st_size for p in OUT.rglob("*") if p.is_file())

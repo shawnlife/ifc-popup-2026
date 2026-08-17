@@ -16,12 +16,18 @@ EVENT = {
     "venue": "Homecoming Centre, District Six, Cape Town",
     "tickets_url": "https://qkt.io/IFCCPT2026",
     "logo": {"file": "logo.png", "w": 800, "h": 620},
+    # Hero background photo, from the 2025 Pop-Up. One of the slugs in
+    # build_images.py HEROES: "theatre-blue", "stage-amber", "audience".
+    # Set to None for a plain navy hero.
+    "hero": "audience",
 }
 
 STAR = "Star Theatre"
 AVALON = "Avalon Theatre"
 
 BIO_PENDING = "Bio coming soon."
+
+# A "bio" may be a single string, or a list of strings for a multi-paragraph bio.
 
 # ---------------------------------------------------------------------------
 # Speakers — ordered alphabetically by first name, which is how attendees
@@ -245,10 +251,38 @@ SPEAKERS = [
     {
         "slug": "nomsa-muthaphuli",
         "name": "Nomsa Muthaphuli",
-        "title": "ECD & Youth Fund Manager",
+        "title": "ECD & Youth Development Fund Manager",
         "org": "Oppenheimer Memorial Trust",
         "linkedin": "https://www.linkedin.com/in/nomsa-muthaphuli-1444b632/",
-        "bio": BIO_PENDING,
+        "bio": [
+            "Nomsa Muthaphuli is a passionate advocate for education and systemic change, "
+            "currently leading the Early Childhood Development (ECD) and Youth Development "
+            "portfolio at the Oppenheimer Memorial Trust. Through her work as a fund manager "
+            "and her previous role as an executive at SmartStart, a large-scale early "
+            "learning social enterprise, she has developed both deep sector expertise and "
+            "broad insight into the programmes, partnerships, and systems that drive "
+            "positive outcomes for young children.",
+
+            "A Strategic Operations Specialist with over 20 years of experience, Nomsa "
+            "brings a unique combination of systems thinking, innovation, and execution "
+            "capability to the design and scaling of high-impact social programmes. Drawing "
+            "on her engineering background, she combines analytical rigour with business "
+            "process optimisation, strategic alignment, and operational excellence across a "
+            "range of sectors.",
+
+            "Over the past decade in the ECD sector, Nomsa has led diverse portfolios "
+            "spanning funder development, impact management, large-scale implementation, "
+            "financial management, systems and process design, and partnership and "
+            "stakeholder engagement. Her work has consistently focused on building "
+            "sustainable, scalable solutions that strengthen programme effectiveness and "
+            "expand access to quality services.",
+
+            "Despite the significant challenges facing the ECD sector, Nomsa remains "
+            "inspired by the potential for meaningful systems change. She is committed to "
+            "advancing universal access to quality early learning opportunities that "
+            "strengthen children’s cognitive development, enhance their readiness to learn, "
+            "and improve their long-term life outcomes.",
+        ],
     },
     {
         "slug": "nondumiso-mabuya",

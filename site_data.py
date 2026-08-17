@@ -643,7 +643,7 @@ SCHEDULE = [
 TOPICS = {
     "opening-plenary": ["Philanthropy"],
     "session-1a": ["Individual Giving", "Grants & Foundations",
-                   "Compliance & Accounting", "Corporate Social Investment"],
+                   "Compliance", "Corporate Social Investment"],
     "session-1b": ["Technology & AI"],
     "session-2a": ["Crowdfunding", "Peer-to-Peer", "Storytelling"],
     "session-2b": ["Corporate Social Investment"],
@@ -766,8 +766,8 @@ SPONSORS = [
      "file": "weaver-network.png", "w": 600, "h": 155},
     # "tall": stacked or square lockups, not wide wordmarks. They get a higher
     # max-height so they do not read as half the size of everything else.
-    {"name": "Homecoming Centre", "url": "https://www.homecomingcentre.com/",
-     "file": "homecoming-centre.png", "w": 600, "h": 431, "tall": True},
+    {"name": "Homecoming Centre", "url": "https://www.homecomingcentre.co.za/",
+     "file": "homecoming-centre.png", "w": 600, "h": 424, "tall": True},
     {"name": "Cooktastic", "url": "https://cooktastic.co.za/",
      "file": "cooktastic.svg", "w": 500, "h": 500, "tall": True},
 ]

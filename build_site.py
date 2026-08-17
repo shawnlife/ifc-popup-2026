@@ -23,6 +23,23 @@ ROOT = Path(__file__).parent
 OUT = ROOT / "index.html"
 SITE_URL = "https://shawnlife.github.io/ifc-popup-2026/"
 
+# `python3 build_site.py --graphik` writes preview-graphik.html instead, with the
+# local Graphik .otf files wired up in place of Inter.
+#
+# The files in graphik-font-family/ are "-Trial" weights from befonts.com, whose
+# licence reads "Personal Use Only". That does NOT cover a public event site with
+# paying sponsors, so they are gitignored and never referenced by index.html.
+# The preview exists so the look can be judged before deciding to buy a real web
+# licence from Commercial Type; if licensed files arrive, drop them in and this
+# becomes the live path.
+GRAPHIK_DIR = "graphik-font-family"
+GRAPHIK_WEIGHTS = {
+    400: "Graphik-Regular-Trial.otf",
+    500: "Graphik-Medium-Trial.otf",
+    600: "Graphik-Semibold-Trial.otf",
+    700: "Graphik-Bold-Trial.otf",
+}
+
 BY_SLUG = {s["slug"]: s for s in D.SPEAKERS}
 BY_ANCHOR = {s["anchor"]: s for s in D.SESSIONS}
 
@@ -433,7 +450,12 @@ html.modal-open #backpill{
 }
 .info-link:hover{background:var(--orange);color:#241f10;text-decoration:none}
 .info-link svg{width:13px;height:13px;fill:currentColor}
+/* Wraps on a phone, which is fine; sits on one line from tablet up. */
 .info-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+@media (min-width:700px){
+  .info-links{flex-wrap:nowrap}
+  .info-links .info-link{padding:0 12px;font-size:.74rem;letter-spacing:.03em}
+}
 .info-links .info-link{margin-top:0}
 .info-outro{
   margin:20px 0 0;text-align:center;color:var(--text);font-size:.95rem;font-weight:600;
@@ -1037,7 +1059,23 @@ TABS = [("panel-schedule", "Schedule"), ("panel-sessions", "Sessions"),
         ("panel-speakers", "Speakers"), ("panel-info", "Info")]
 
 
-def render_page():
+def font_block(graphik):
+    """The <head> font wiring: local Graphik for the preview, Inter otherwise."""
+    if graphik:
+        faces = "\n".join(
+            f"@font-face{{font-family:'Graphik';font-style:normal;font-weight:{w};"
+            f"font-display:swap;src:url('{GRAPHIK_DIR}/{f}') format('opentype')}}"
+            for w, f in sorted(GRAPHIK_WEIGHTS.items()))
+        return f"<style>\n{faces}\n</style>"
+    return (
+        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+        '<link rel="stylesheet"\n'
+        '  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700'
+        '&display=swap">')
+
+
+def render_page(graphik=False):
     ev = D.EVENT
     tabs = "".join(
         f'<a role="tab" id="tab-{pid}" href="#{pid}" aria-controls="{pid}" '
@@ -1085,10 +1123,7 @@ def render_page():
 <link rel="icon" href="images/logo.png">
 <link rel="apple-touch-icon" href="images/logo.png">
 {preload}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+{font_block(graphik)}
 <style>{CSS}</style>
 </head>
 <body>
@@ -1157,10 +1192,21 @@ def validate(page):
 
 
 def main():
-    page = render_page()
+    graphik = "--graphik" in sys.argv
+    dest = ROOT / ("preview-graphik.html" if graphik else "index.html")
+    if graphik:
+        missing = [f for f in GRAPHIK_WEIGHTS.values()
+                   if not (ROOT / GRAPHIK_DIR / f).exists()]
+        if missing:
+            sys.exit("Missing Graphik weights:\n  " + "\n  ".join(missing))
+
+    page = render_page(graphik)
     n_ids, n_refs = validate(page)
-    OUT.write_text(page, encoding="utf-8")
-    print(f"Wrote index.html — {OUT.stat().st_size / 1024:.0f} KB")
+    dest.write_text(page, encoding="utf-8")
+    print(f"Wrote {dest.name} — {dest.stat().st_size / 1024:.0f} KB")
+    if graphik:
+        print("  Graphik preview (local only — trial files are 'Personal Use Only',")
+        print("  gitignored, and never referenced by index.html).")
     print(f"  {len(D.SCHEDULE)} schedule slots, {len(D.SESSIONS)} sessions, "
           f"{len(D.SPEAKERS)} speakers, {len(D.SPONSORS)} sponsors")
     print(f"  {len(ALL_TOPICS)} topics: " + ", ".join(ALL_TOPICS))

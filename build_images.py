@@ -11,6 +11,7 @@ Re-run this any time a photo or logo is replaced:
 """
 
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -87,6 +88,17 @@ SPONSORS = {
     # crisp at any size instead of being rasterised to a fixed width.
     "logo_cooktastic_circle.svg": "cooktastic",
 }
+
+# Logos that arrive with dead space around the artwork. Trimming makes them fill
+# their cell in the sponsor wall instead of floating tiny in the middle.
+#
+# Raster: trim fully-transparent margins automatically.
+TRIM_TRANSPARENT = {"homecoming-centre"}
+# Vector: replace the viewBox to crop. Cooktastic is a circular badge on an
+# opaque white circle — invisible on the white sponsor panel — so the visible ink
+# filled only 199x285 of its 500x500 canvas (measured). This crops to the ink
+# plus a little breathing room, losslessly.
+SVG_VIEWBOX = {"cooktastic": "140 97 220 305"}
 
 MAIN_LOGO = "Pop-Up Cape Town logo white no shadow.png"
 
@@ -257,14 +269,25 @@ def build_sponsors():
 
         if ext == ".svg":
             # Vector: nothing to resize, and PIL cannot read it anyway.
-            shutil.copy2(src, dest)
+            svg = src.read_text(encoding="utf-8")
+            box = SVG_VIEWBOX.get(slug)
+            if box:
+                svg, n = re.subn(r'viewBox="[^"]*"', f'viewBox="{box}"', svg, count=1)
+                if n != 1:
+                    sys.exit(f"{name}: expected one viewBox to rewrite, found {n}")
+            dest.write_text(svg, encoding="utf-8")
             manifest[slug] = {"file": dest.name, "w": None, "h": None}
             print(f"  {slug:<26} {'vector':>9}  "
-                  f"{dest.stat().st_size / 1024:6.0f} KB   <- {name}")
+                  f"{dest.stat().st_size / 1024:6.0f} KB   <- {name}"
+                  + ("  (viewBox cropped)" if box else ""))
             continue
 
         with Image.open(src) as img:
             img = ImageOps.exif_transpose(img)
+            if slug in TRIM_TRANSPARENT:
+                bbox = img.convert("RGBA").getchannel("A").getbbox()
+                if bbox:
+                    img = img.crop(bbox)
             if max(img.size) > LOGO_MAX:
                 img = fit(img, LOGO_MAX)
                 img.save(dest, lossless=True) if ext == ".webp" else img.save(dest)

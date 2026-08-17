@@ -26,8 +26,12 @@ LOGO = ROOT / "assets" / "images" / "logo.png"
 FONTS = ROOT / "source" / "fonts-graphik"
 OUT = ROOT / "assets" / "images" / "social-card.jpg"
 
-# A hand-designed card dropped in here wins over the generated one. Any image
-# format PIL reads; it gets resized and compressed to fit the size budget.
+# Set this to a filename in source/social/ to publish that artwork instead of
+# the card this script draws. None = use the generated card.
+# Shawn's sponsor-credited version is kept at source/social/share-card.png if
+# it is ever wanted: set SUPPLIED = "share-card.png".
+SUPPLIED = None
+
 SUPPLIED_DIR = ROOT / "source" / "social"
 SUPPLIED_WIDTHS = (1600, 1200, 1000)
 
@@ -79,14 +83,12 @@ def save_within_budget(img, widths):
 
 
 def use_supplied():
-    """Publish a supplied card if there is one. Returns True if it did."""
-    if not SUPPLIED_DIR.exists():
+    """Publish the supplied card if one is selected. Returns True if it did."""
+    if not SUPPLIED:
         return False
-    files = sorted(f for f in SUPPLIED_DIR.iterdir()
-                   if f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"})
-    if not files:
-        return False
-    src = files[0]
+    src = SUPPLIED_DIR / SUPPLIED
+    if not src.exists():
+        sys.exit(f"SUPPLIED is set to {SUPPLIED!r} but {src} does not exist.")
     # Flatten any alpha onto navy: a transparent share image renders as a white
     # block in WhatsApp, which is what went wrong the first time round.
     img = Image.open(src)

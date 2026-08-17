@@ -659,6 +659,65 @@ TOPICS = {
 PANELS = {"session-1a", "session-3a"}
 
 # ---------------------------------------------------------------------------
+# "On the day" practical info — the fourth tab.
+#
+# Each block has a heading plus either "items" (a bulleted list) or "body"
+# (paragraphs). "html" is rendered as-is rather than escaped, so it can hold a
+# link; keep it to plain anchors. "link" adds a button under the block.
+# ---------------------------------------------------------------------------
+
+INFO_INTRO = ("A few details to help you prepare for a day of learning, networking and "
+              "sharing at the IFC Cape Town Pop-Up.")
+
+INFO_BLOCKS = [
+    {
+        "heading": "Start planning your day",
+        "items": ["Registration opens at 8:00",
+                  "The programme starts promptly at 9:00",
+                  "IFC Pop-Up ends at 17:00"],
+        "html": 'Have a look at the <a href="#panel-schedule">schedule</a> and '
+                '<a href="#panel-sessions">sessions</a> to start planning which ones '
+                'you would like to attend.',
+    },
+    {
+        "heading": "How to get there",
+        "body": ["The Homecoming Centre, corner of Buitenkant and Caledon Street "
+                 "(entrance on Caledon Street), District Six, Cape Town 7785."],
+        "link": {"label": "Open in Maps",
+                 "url": "https://www.google.com/maps/search/?api=1&query="
+                        "Homecoming+Centre+Caledon+Street+District+Six+Cape+Town"},
+    },
+    {
+        "heading": "Parking",
+        "body": ["Some paid parking is available at Harrington Square Parking Lot, "
+                 "27 Caledon Street, District Six, Cape Town 7925."],
+        "link": {"label": "Open in Maps",
+                 "url": "https://www.google.com/maps/search/?api=1&query="
+                        "Harrington+Square+Parking+27+Caledon+Street+Cape+Town"},
+    },
+    {
+        "heading": "What to bring",
+        "items": ["Something to take notes with as you learn",
+                  "A way to share your contact details as you network — business cards, "
+                  "the LinkedIn app, or whatever works for you"],
+    },
+    {
+        "heading": "Get social",
+        "body": ["Follow the IFC Cape Town Pop-Up, CCA Recruitment and Consulting, and "
+                 "The Resource Alliance to stay up to date with all the news and coverage."],
+        "hashtag": "#IFCCPT2026",
+    },
+    {
+        "heading": "Questions?",
+        "html": 'Email us at <a href="mailto:shawnlifebiz@gmail.com">'
+                'shawnlifebiz@gmail.com</a> and we will help.',
+    },
+]
+
+INFO_OUTRO = "We are looking forward to seeing you on Wednesday, 2 September."
+
+
+# ---------------------------------------------------------------------------
 # Sponsors — displayed in this order, on white tiles (several logos are
 # dark-on-transparent and would vanish on the navy background).
 # ---------------------------------------------------------------------------

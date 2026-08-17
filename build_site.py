@@ -112,12 +112,13 @@ header{
 [role=tab]{
   flex:1 1 0;min-width:0;max-width:190px;min-height:44px;
   display:flex;align-items:center;justify-content:center;
-  padding:0 8px;border-radius:9px;
-  font-size:.84rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  padding:0 4px;border-radius:9px;
+  font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;
   color:var(--muted);text-decoration:none;white-space:nowrap;
   border:1px solid transparent;background:none;cursor:pointer;font-family:inherit;
 }
-@media (min-width:760px){[role=tab]{font-size:.9rem;padding:0 26px}}
+@media (min-width:400px){[role=tab]{font-size:.82rem;letter-spacing:.05em;padding:0 8px}}
+@media (min-width:760px){[role=tab]{font-size:.9rem;padding:0 24px}}
 [role=tab]:hover{color:#fff;text-decoration:none;background:rgba(255,255,255,.06)}
 [role=tab][aria-selected=true]{color:#241f10;background:var(--orange);border-color:var(--orange)}
 
@@ -371,6 +372,41 @@ html.modal-open,html.modal-open body{overflow:hidden}
   text-transform:uppercase;letter-spacing:.04em;
 }
 #backpill:hover{background:#ffa61f}
+
+/* ---------- on-the-day info ---------- */
+.info-when{
+  background:var(--surface);border:1px solid var(--line);
+  border-left:3px solid var(--orange);border-radius:var(--radius);
+  padding:14px 16px;margin:0 0 16px;
+}
+.info-when b{display:block;font-size:1.05rem;letter-spacing:.02em}
+.info-when span{color:var(--muted);font-size:.9rem}
+.info-grid{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:700px){.info-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.info-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;
+}
+.info-card h3{margin:0 0 10px;color:var(--orange);font-size:.95rem;line-height:1.3}
+.info-card p{margin:0 0 10px;font-size:.92rem;color:var(--text)}
+.info-card p:last-child{margin-bottom:0}
+.info-card a{color:var(--orange);text-decoration:underline;text-underline-offset:2px}
+.info-list{margin:0 0 12px;padding:0;list-style:none}
+.info-list li{position:relative;padding-left:18px;font-size:.92rem;margin-bottom:6px}
+.info-list li::before{content:'';position:absolute;left:0;top:.55em;width:7px;height:7px;
+  border-radius:50%;background:var(--orange)}
+.info-card .hashtag{color:var(--orange);font-weight:700;letter-spacing:.04em}
+.info-link{
+  display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 16px;
+  margin-top:4px;border-radius:999px;border:1px solid rgba(244,148,4,.5);
+  color:var(--orange);font-size:.8rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;text-decoration:none;
+}
+.info-link:hover{background:var(--orange);color:#241f10;text-decoration:none}
+.info-link svg{width:13px;height:13px;fill:currentColor}
+.info-outro{
+  margin:20px 0 0;text-align:center;color:var(--text);font-size:.95rem;font-weight:600;
+}
 
 /* ---------- sponsors: one pale band, not nine white tiles ---------- */
 .sponsors-wrap{margin-top:46px;padding:34px 0 38px;background:#EEEFF5;border-radius:16px}
@@ -859,6 +895,37 @@ def render_speakers():
             '<div class="speakers">' + "".join(cards) + '</div>')
 
 
+def render_info():
+    blocks = []
+    for b in D.INFO_BLOCKS:
+        parts = []
+        if b.get("items"):
+            parts.append('<ul class="info-list">'
+                         + "".join(f'<li>{e(i)}</li>' for i in b["items"])
+                         + '</ul>')
+        for p in b.get("body", []):
+            parts.append(f'<p>{e(p)}</p>')
+        if b.get("html"):
+            # Authored above, not user input, so intentionally not escaped.
+            parts.append(f'<p>{b["html"]}</p>')
+        if b.get("hashtag"):
+            parts.append(f'<p class="hashtag">{e(b["hashtag"])}</p>')
+        if b.get("link"):
+            parts.append(
+                f'<a class="info-link" href="{e(b["link"]["url"])}" target="_blank" '
+                f'rel="noopener">{e(b["link"]["label"])} {EXT_SVG}</a>')
+        blocks.append(f'<section class="info-card"><h3>{e(b["heading"])}</h3>'
+                      + "".join(parts) + '</section>')
+
+    ev = D.EVENT
+    return ('<h2 class="panel-head">On the Day</h2>'
+            f'<p class="panel-sub">{e(D.INFO_INTRO)}</p>'
+            f'<div class="info-when"><b>{e(ev["date"])}</b>'
+            f'<span>{e(ev["venue"])}</span></div>'
+            '<div class="info-grid">' + "".join(blocks) + '</div>'
+            f'<p class="info-outro">{e(D.INFO_OUTRO)}</p>')
+
+
 def render_sponsors():
     items = "".join(
         f'<li><a href="{e(s["url"])}" target="_blank" rel="noopener" '
@@ -893,7 +960,7 @@ def render_modal():
 
 
 TABS = [("panel-schedule", "Schedule"), ("panel-sessions", "Sessions"),
-        ("panel-speakers", "Speakers")]
+        ("panel-speakers", "Speakers"), ("panel-info", "Info")]
 
 
 def render_page():
@@ -906,7 +973,8 @@ def render_page():
     )
     panels = [("panel-schedule", render_schedule()),
               ("panel-sessions", render_sessions()),
-              ("panel-speakers", render_speakers())]
+              ("panel-speakers", render_speakers()),
+              ("panel-info", render_info())]
     panels_html = "".join(
         f'<section role="tabpanel" id="{pid}" aria-labelledby="tab-{pid}" tabindex="0">'
         f'{body}</section>'

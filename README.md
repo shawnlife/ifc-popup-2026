@@ -61,9 +61,13 @@ fills the circle. Originals are never modified.
 
 - One self-contained HTML file: embedded CSS and JS, no frameworks, no build
   step needed to view it. Just open `index.html`.
-- Three tabs (Schedule / Sessions / Speakers). Only one shows at a time. Links
-  between them switch tabs and jump to the right card, with a "back" pill to
-  return. Without JavaScript it degrades to one long readable page.
+- Four tabs (Schedule / Sessions / Speakers / Info). Only one shows at a time.
+  Links between them switch tabs and jump to the right card, with a "back" pill
+  to return. Without JavaScript it degrades to one long readable page.
+- The Info tab ("On the Day") is built from `INFO_INTRO`, `INFO_BLOCKS` and
+  `INFO_OUTRO` in `site_data.py`. A block takes `items` (bulleted) or `body`
+  (paragraphs), optionally `html` for a block containing a link, `hashtag`, and
+  `link` for a button such as "Open in Maps".
 - Tapping a speaker's name anywhere opens their profile in a pop-up: big
   headshot, bio, which session they're in, LinkedIn. Without JavaScript the same
   content simply shows inline on the card instead.
@@ -102,6 +106,6 @@ the slugs in `HEROES` in `build_images.py` — `theatre-blue`, `stage-amber`,
 
 - A higher-resolution Fundraising Beyond Borders logo (current is 200×50px)
 - Cooktastic and Homecoming Centre logos to add to the sponsor band
-- "On the day" info (parking etc.) — likely a fourth tab
+- Social handles for the "Get social" block, if those names should be links
 - Custom domain (`ifc.shawnlife.com`) — needs a DNS record plus a `CNAME` file,
   and a reprinted QR code

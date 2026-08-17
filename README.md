@@ -4,7 +4,7 @@ Mobile-first schedule site for the IFC Cape Town Pop-Up, **2 September 2026**,
 Homecoming Centre, District Six, Cape Town. Attendees scan a QR code on the day
 and read the programme on their phones.
 
-**Live:** https://shawnlife.github.io/ifc-popup-2026/
+**Live:** https://ifc.shawnlife.com/
 
 ---
 
@@ -115,14 +115,22 @@ URL**, paste the Apps Script `/exec` URL. Refreshes every 60 seconds.
 `qr/ifc-popup-2026-qr-print-A5.png` is print-ready at A5, 300dpi. Both files were
 decoded back to the live URL to confirm they scan.
 
-**If the site moves to a custom domain, regenerate and reprint:**
+It points at **https://ifc.shawnlife.com/**. If the domain ever changes, the QR
+must be regenerated and reprinted — the URL is baked into the code:
 
 ```bash
-python3 build/make_qr.py https://ifc.shawnlife.com/
+python3 build/make_qr.py https://new-domain/
 ```
+
+## Custom domain
+
+Live at **ifc.shawnlife.com**, with HTTPS enforced.
+
+- Squarespace DNS: `CNAME` on host `ifc` -> `shawnlife.github.io`
+- `CNAME` file in this repo holds the domain. **Do not delete it** — Pages
+  reads it, and removing it drops the domain
+- `shawnlife.github.io/ifc-popup-2026/` now 301-redirects here
 
 ### Still outstanding
 
 - A higher-resolution Fundraising Beyond Borders logo (current is 200×50px)
-- Custom domain `ifc.shawnlife.com` — DNS record plus a `CNAME` file, and a
-  reprinted QR code

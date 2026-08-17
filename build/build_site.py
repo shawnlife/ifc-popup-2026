@@ -21,7 +21,7 @@ import site_data as D
 
 ROOT = Path(__file__).parent.parent      # project root, not build/
 OUT = ROOT / "index.html"
-SITE_URL = "https://shawnlife.github.io/ifc-popup-2026/"
+SITE_URL = "https://ifc.shawnlife.com/"
 
 # Graphik is self-hosted from fonts/ (see build_fonts.py). Weight -> woff2 file.
 # Self-hosting means the site makes zero third-party requests: no Google Fonts,

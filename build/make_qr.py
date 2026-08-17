@@ -17,7 +17,7 @@ from pathlib import Path
 import segno
 from PIL import Image, ImageDraw, ImageFont
 
-URL = sys.argv[1] if len(sys.argv) > 1 else "https://shawnlife.github.io/ifc-popup-2026/"
+URL = sys.argv[1] if len(sys.argv) > 1 else "https://ifc.shawnlife.com/"
 OUT = Path(__file__).parent.parent / "qr"
 NAVY, ORANGE, MUTED = "#303249", "#F49404", "#A0A3C0"
 

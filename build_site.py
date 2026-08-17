@@ -23,22 +23,11 @@ ROOT = Path(__file__).parent
 OUT = ROOT / "index.html"
 SITE_URL = "https://shawnlife.github.io/ifc-popup-2026/"
 
-# `python3 build_site.py --graphik` writes preview-graphik.html instead, with the
-# local Graphik .otf files wired up in place of Inter.
-#
-# The files in graphik-font-family/ are "-Trial" weights from befonts.com, whose
-# licence reads "Personal Use Only". That does NOT cover a public event site with
-# paying sponsors, so they are gitignored and never referenced by index.html.
-# The preview exists so the look can be judged before deciding to buy a real web
-# licence from Commercial Type; if licensed files arrive, drop them in and this
-# becomes the live path.
-GRAPHIK_DIR = "graphik-font-family"
-GRAPHIK_WEIGHTS = {
-    400: "Graphik-Regular-Trial.otf",
-    500: "Graphik-Medium-Trial.otf",
-    600: "Graphik-Semibold-Trial.otf",
-    700: "Graphik-Bold-Trial.otf",
-}
+# Graphik is self-hosted from fonts/ (see build_fonts.py). Weight -> woff2 file.
+# Self-hosting means the site makes zero third-party requests: no Google Fonts,
+# so no visitor IP leaves for anyone else, and nothing to fail on event wifi.
+GRAPHIK = {400: "graphik-400.woff2", 500: "graphik-500.woff2",
+           600: "graphik-600.woff2", 700: "graphik-700.woff2"}
 
 BY_SLUG = {s["slug"]: s for s in D.SPEAKERS}
 BY_ANCHOR = {s["anchor"]: s for s in D.SESSIONS}
@@ -98,7 +87,7 @@ html:focus-within{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto}}
 body{
   margin:0;background:var(--bg);color:var(--text);
-  font-family:'Graphik','Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  font-family:'Graphik',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   font-size:16px;line-height:1.55;
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
@@ -221,7 +210,9 @@ header{
 .card .title{display:block;font-weight:700;font-size:.92rem;line-height:1.35;
   color:var(--text);margin:0 0 6px;text-transform:uppercase;letter-spacing:.02em}
 a.title:hover{color:var(--orange);text-decoration:none}
-a.title::after{content:' \\203A';color:var(--orange);font-weight:700}
+/* Non-breaking space binds the chevron to the last word, so it can never
+   wrap onto a line by itself. */
+a.title::after{content:'\\00A0\\203A';color:var(--orange);font-weight:700}
 .card .who{font-size:.87rem;color:var(--text);margin:0;line-height:1.5}
 .card .who a{color:var(--text);text-decoration:underline;
   text-decoration-color:rgba(255,255,255,.4);text-underline-offset:2px}
@@ -543,15 +534,28 @@ TRACK_JS = """
   document.addEventListener('visibilitychange', function(){
     if(document.visibilityState === 'hidden') flushTrack();
   });
+  // Every outbound link is recorded, labelled by what the visitor actually saw
+  // (link text, or a sponsor logo's alt text), so "did anyone click the train
+  // schedule / a sponsor / ShawnLife" is answerable.
+  function outLabel(a){
+    var t = (a.textContent || '').replace(/\\s+/g, ' ').trim();
+    if(!t){ var img = a.querySelector('img'); t = img ? (img.alt || '') : ''; }
+    if(!t){ try { t = new URL(a.href).hostname; } catch(err){ t = a.href; } }
+    return t;
+  }
   document.addEventListener('click', function(ev){
     var a = ev.target && ev.target.closest ? ev.target.closest('a[href^="http"]') : null;
     if(!a) return;
     if(a.href.indexOf('qkt.io') > -1){ track('ticket', ''); return; }
     if(a.classList.contains('li')){
-      var c = a.closest('.spk') || document.getElementById('modal');
-      track('linkedin', c && c.id === 'modal'
-        ? (document.getElementById('modal-name').textContent || '') : (c ? c.id : ''));
+      // Record whose profile, not the word "LinkedIn".
+      var card = a.closest('.spk');
+      var who = card ? card.getAttribute('data-name')
+        : (document.getElementById('modal-name').textContent || '').trim();
+      track('linkedin', who);
+      return;
     }
+    track('outbound', outLabel(a));
   });
   track('visit', '');
 """
@@ -1105,20 +1109,18 @@ TABS = [("panel-schedule", "Schedule"), ("panel-sessions", "Sessions"),
         ("panel-speakers", "Speakers"), ("panel-info", "Info")]
 
 
-def font_block(graphik):
-    """The <head> font wiring: local Graphik for the preview, Inter otherwise."""
-    if graphik:
-        faces = "\n".join(
-            f"@font-face{{font-family:'Graphik';font-style:normal;font-weight:{w};"
-            f"font-display:swap;src:url('{GRAPHIK_DIR}/{f}') format('opentype')}}"
-            for w, f in sorted(GRAPHIK_WEIGHTS.items()))
-        return f"<style>\n{faces}\n</style>"
-    return (
-        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-        '<link rel="stylesheet"\n'
-        '  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700'
-        '&display=swap">')
+def font_block():
+    """Self-hosted Graphik. font-display:swap so text paints immediately in the
+    system font and swaps when the woff2 lands."""
+    faces = "\n".join(
+        f"@font-face{{font-family:'Graphik';font-style:normal;font-weight:{w};"
+        f"font-display:swap;src:url('fonts/{f}') format('woff2')}}"
+        for w, f in sorted(GRAPHIK.items()))
+    # Preload only the two weights that appear above the fold.
+    pre = "\n".join(
+        f'<link rel="preload" href="fonts/{GRAPHIK[w]}" as="font" '
+        f'type="font/woff2" crossorigin>' for w in (400, 700))
+    return f"{pre}\n<style>\n{faces}\n</style>"
 
 
 def tracking_js():
@@ -1129,7 +1131,7 @@ def tracking_js():
     return TRACK_JS.replace("__TRACK_URL__", url)
 
 
-def render_page(graphik=False):
+def render_page():
     ev = D.EVENT
     tabs = "".join(
         f'<a role="tab" id="tab-{pid}" href="#{pid}" aria-controls="{pid}" '
@@ -1177,7 +1179,7 @@ def render_page(graphik=False):
 <link rel="icon" href="images/logo.png">
 <link rel="apple-touch-icon" href="images/logo.png">
 {preload}
-{font_block(graphik)}
+{font_block()}
 <style>{CSS}</style>
 </head>
 <body>
@@ -1261,23 +1263,15 @@ def write_analytics_names():
 
 
 def main():
-    graphik = "--graphik" in sys.argv
-    dest = ROOT / ("preview-graphik.html" if graphik else "index.html")
-    if graphik:
-        missing = [f for f in GRAPHIK_WEIGHTS.values()
-                   if not (ROOT / GRAPHIK_DIR / f).exists()]
-        if missing:
-            sys.exit("Missing Graphik weights:\n  " + "\n  ".join(missing))
+    missing = [f for f in GRAPHIK.values() if not (ROOT / "fonts" / f).exists()]
+    if missing:
+        sys.exit("Missing webfonts (run build_fonts.py first):\n  " + "\n  ".join(missing))
 
-    page = render_page(graphik)
+    page = render_page()
     n_ids, n_refs = validate(page)
-    dest.write_text(page, encoding="utf-8")
-    if not graphik:
-        write_analytics_names()
-    print(f"Wrote {dest.name} — {dest.stat().st_size / 1024:.0f} KB")
-    if graphik:
-        print("  Graphik preview (local only — trial files are 'Personal Use Only',")
-        print("  gitignored, and never referenced by index.html).")
+    OUT.write_text(page, encoding="utf-8")
+    write_analytics_names()
+    print(f"Wrote index.html — {OUT.stat().st_size / 1024:.0f} KB")
     print(f"  {len(D.SCHEDULE)} schedule slots, {len(D.SESSIONS)} sessions, "
           f"{len(D.SPEAKERS)} speakers, {len(D.SPONSORS)} sponsors")
     print(f"  {len(ALL_TOPICS)} topics: " + ", ".join(ALL_TOPICS))

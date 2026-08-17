@@ -16,10 +16,14 @@
 <link rel="apple-touch-icon" href="images/logo.png">
 <link rel="preload" as="image" href="images/hero/audience-900.jpg" media="(max-width: 899px)">
 <link rel="preload" as="image" href="images/hero/audience-1800.jpg" media="(min-width: 900px)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="preload" href="fonts/graphik-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/graphik-700.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Graphik';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/graphik-400.woff2') format('woff2')}
+@font-face{font-family:'Graphik';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/graphik-500.woff2') format('woff2')}
+@font-face{font-family:'Graphik';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/graphik-600.woff2') format('woff2')}
+@font-face{font-family:'Graphik';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/graphik-700.woff2') format('woff2')}
+</style>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none !important}
@@ -42,7 +46,7 @@ html:focus-within{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto}}
 body{
   margin:0;background:var(--bg);color:var(--text);
-  font-family:'Graphik','Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  font-family:'Graphik',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   font-size:16px;line-height:1.55;
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
@@ -165,7 +169,9 @@ header{
 .card .title{display:block;font-weight:700;font-size:.92rem;line-height:1.35;
   color:var(--text);margin:0 0 6px;text-transform:uppercase;letter-spacing:.02em}
 a.title:hover{color:var(--orange);text-decoration:none}
-a.title::after{content:' \203A';color:var(--orange);font-weight:700}
+/* Non-breaking space binds the chevron to the last word, so it can never
+   wrap onto a line by itself. */
+a.title::after{content:'\00A0\203A';color:var(--orange);font-weight:700}
 .card .who{font-size:.87rem;color:var(--text);margin:0;line-height:1.5}
 .card .who a{color:var(--text);text-decoration:underline;
   text-decoration-color:rgba(255,255,255,.4);text-underline-offset:2px}

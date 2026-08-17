@@ -21,7 +21,8 @@ var CACHE_SECONDS = 60;      // dashboard reads are cheap and near-live
 
 // Only these event types are accepted. Anything else is dropped, so a stray
 // script posting junk cannot invent new columns of noise.
-var ALLOWED = ['visit', 'tab', 'session', 'speaker', 'filter', 'ticket', 'linkedin'];
+var ALLOWED = ['visit', 'tab', 'session', 'speaker', 'filter', 'ticket',
+               'linkedin', 'outbound'];
 var MAX_EVENTS_PER_POST = 60;
 var MAX_TARGET_LEN = 80;
 
@@ -93,14 +94,17 @@ function buildSummary_() {
   var last = sh.getLastRow();
   if (last < 2) {
     return { generated: new Date().toISOString(), total: 0, visits: 0,
-             sessions: [], speakers: [], tabs: [], filters: [],
-             byHour: [], byDay: [], clicks: {} };
+             uniqueVisits: 0, sessions: [], speakers: [], tabs: [], filters: [],
+             outbound: [], visitsByHour: [],
+             clicks: { ticket: 0, linkedin: 0, outbound: 0 } };
   }
 
   var values = sh.getRange(2, 1, last - 1, 4).getValues();
-  var sessions = {}, speakers = {}, tabs = {}, filters = {};
-  var byHour = {}, byDay = {}, sids = {}, clicks = { ticket: 0, linkedin: 0 };
+  var sessions = {}, speakers = {}, tabs = {}, filters = {}, outbound = {};
+  var visitsByHour = {}, sids = {};
+  var clicks = { ticket: 0, linkedin: 0, outbound: 0 };
   var total = 0, visits = 0;
+  var tz = Session.getScriptTimeZone();
 
   for (var i = 0; i < values.length; i++) {
     var ts = values[i][0], sid = values[i][1], type = values[i][2], target = values[i][3];
@@ -108,13 +112,11 @@ function buildSummary_() {
     total++;
     if (sid) sids[sid] = 1;
 
-    if (ts instanceof Date) {
-      var day = Utilities.formatDate(ts, Session.getScriptTimeZone(), 'yyyy-MM-dd');
-      byDay[day] = (byDay[day] || 0) + 1;
-      if (type === 'visit') {
-        var hour = Utilities.formatDate(ts, Session.getScriptTimeZone(), 'yyyy-MM-dd HH');
-        byHour[hour] = (byHour[hour] || 0) + 1;
-      }
+    // One full hourly series of visits. The dashboard rolls it up to days or
+    // zooms into the event day itself, so only one series has to be sent.
+    if (ts instanceof Date && type === 'visit') {
+      var hour = Utilities.formatDate(ts, tz, 'yyyy-MM-dd HH');
+      visitsByHour[hour] = (visitsByHour[hour] || 0) + 1;
     }
 
     if (type === 'visit') visits++;
@@ -123,7 +125,16 @@ function buildSummary_() {
     else if (type === 'tab') tabs[target] = (tabs[target] || 0) + 1;
     else if (type === 'filter') filters[target] = (filters[target] || 0) + 1;
     else if (type === 'ticket') clicks.ticket++;
-    else if (type === 'linkedin') clicks.linkedin++;
+    else if (type === 'linkedin') {
+      clicks.linkedin++;
+      speakers[target] = speakers[target] || 0;   // keep zero-open profiles listed
+      outbound['LinkedIn — ' + (target || 'unknown')] =
+        (outbound['LinkedIn — ' + (target || 'unknown')] || 0) + 1;
+    }
+    else if (type === 'outbound') {
+      clicks.outbound++;
+      outbound[target || '(unknown)'] = (outbound[target || '(unknown)'] || 0) + 1;
+    }
   }
 
   return {
@@ -136,8 +147,8 @@ function buildSummary_() {
     speakers: rank_(speakers),
     tabs: rank_(tabs),
     filters: rank_(filters),
-    byDay: rank_(byDay, true),
-    byHour: rank_(byHour, true)
+    outbound: rank_(outbound),
+    visitsByHour: rank_(visitsByHour, true)
   };
 }
 

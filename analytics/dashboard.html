@@ -6,6 +6,7 @@
 <title>IFC Pop-Up 2026 — Usage</title>
 <style>
 *,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
 :root{
   --orange:#F49404;--bg:#303249;--surface:#3D3F5A;--surface-2:#474A69;
   --text:#fff;--muted:#CDD0E4;--line:rgba(255,255,255,.10);
@@ -13,7 +14,7 @@
 body{margin:0;background:var(--bg);color:var(--text);
   font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   font-size:15px;line-height:1.5}
-.wrap{max-width:1100px;margin:0 auto;padding:22px 16px 60px}
+.wrap{max-width:1150px;margin:0 auto;padding:22px 16px 60px}
 h1{margin:0 0 4px;font-size:1.3rem;text-transform:uppercase;letter-spacing:.02em}
 .sub{margin:0 0 20px;color:var(--muted);font-size:.85rem}
 .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 22px}
@@ -24,18 +25,25 @@ button{
 }
 button.ghost{background:none;color:var(--muted);border-color:rgba(255,255,255,.2)}
 button.ghost:hover{color:#fff;border-color:#fff}
+button.ghost[aria-pressed=true]{background:var(--orange);border-color:var(--orange);color:#241f10}
 button:disabled{opacity:.5;cursor:default}
-.tiles{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 22px}
-@media(min-width:720px){.tiles{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.tiles{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 18px}
+@media(min-width:760px){.tiles{grid-template-columns:repeat(6,minmax(0,1fr))}}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.tile b{display:block;font-size:1.7rem;line-height:1.1;font-variant-numeric:tabular-nums}
-.tile span{color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.09em}
-.grid{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
-@media(min-width:820px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-.card h2{margin:0 0 12px;font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;
+.tile b{display:block;font-size:1.6rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile span{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;margin:0 0 14px}
+.card header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  justify-content:space-between;margin:0 0 14px}
+.card h2{margin:0;font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;
   color:var(--orange)}
-.row{display:grid;grid-template-columns:minmax(0,1fr) 46px;gap:10px;align-items:center;
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{min-height:34px;padding:0 12px;font-size:.7rem}
+.grid{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:860px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.grid .card{margin:0}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 52px;gap:10px;align-items:center;
   padding:5px 0}
 .row .label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   font-size:.85rem}
@@ -43,10 +51,29 @@ button:disabled{opacity:.5;cursor:default}
 .track{grid-column:1 / -1;height:6px;border-radius:4px;background:rgba(0,0,0,.25);
   overflow:hidden;margin-top:-2px}
 .fill{height:100%;background:var(--orange);border-radius:4px}
+.more{margin-top:10px}
+.more button{min-height:36px;padding:0 14px;font-size:.7rem}
 .empty{color:var(--muted);font-size:.85rem;font-style:italic}
 .err{background:#5a2320;border:1px solid #a3413a;border-radius:12px;padding:14px 16px;
   margin:0 0 18px;font-size:.88rem}
 .err code{background:rgba(0,0,0,.3);padding:1px 5px;border-radius:4px}
+svg.chart{display:block;width:100%;height:auto}
+svg.chart .b{fill:var(--orange)}
+svg.chart .b:hover{fill:#ffb340}
+svg.chart text{fill:var(--muted);font-size:11px;font-family:inherit}
+svg.chart line{stroke:rgba(255,255,255,.12)}
+/* full-list popup */
+.modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;
+  justify-content:center;padding:20px}
+.modal-bg{position:absolute;inset:0;background:rgba(16,17,26,.75)}
+.modal-card{position:relative;background:var(--surface);border:1px solid rgba(255,255,255,.2);
+  border-radius:14px;width:100%;max-width:620px;max-height:82vh;overflow-y:auto;
+  padding:22px 22px 24px}
+.modal-card h2{margin:0 0 14px;font-size:.85rem;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--orange)}
+.modal-x{position:absolute;top:10px;right:10px;width:38px;height:38px;border-radius:50%;
+  min-height:38px;padding:0;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);
+  color:#fff;font-size:1.2rem}
 a{color:var(--orange)}
 </style>
 </head>
@@ -57,7 +84,7 @@ a{color:var(--orange)}
 
   <div class="bar">
     <button id="refresh">Refresh</button>
-    <button class="ghost" id="auto">Auto-refresh: on</button>
+    <button class="ghost" id="auto" aria-pressed="true">Auto-refresh: on</button>
     <button class="ghost" id="seturl">Change URL</button>
   </div>
 
@@ -69,15 +96,36 @@ a{color:var(--orange)}
     <div class="tile"><b id="t-sessions">&mdash;</b><span>Session opens</span></div>
     <div class="tile"><b id="t-speakers">&mdash;</b><span>Profile opens</span></div>
     <div class="tile"><b id="t-tickets">&mdash;</b><span>Ticket clicks</span></div>
+    <div class="tile"><b id="t-out">&mdash;</b><span>Outbound clicks</span></div>
+  </div>
+
+  <div class="card">
+    <header>
+      <h2>Visits over time</h2>
+      <div class="seg" id="gran">
+        <button class="ghost" data-g="hour" aria-pressed="false">Hourly</button>
+        <button class="ghost" data-g="day" aria-pressed="true">Daily</button>
+        <button class="ghost" data-g="event" aria-pressed="false">Event day</button>
+      </div>
+    </header>
+    <div id="c-time"></div>
   </div>
 
   <div class="grid">
-    <div class="card"><h2>Session demand</h2><div id="c-sessions"></div></div>
-    <div class="card"><h2>Speaker interest</h2><div id="c-speakers"></div></div>
-    <div class="card"><h2>Tabs used</h2><div id="c-tabs"></div></div>
-    <div class="card"><h2>Filters used</h2><div id="c-filters"></div></div>
-    <div class="card"><h2>Visits per day</h2><div id="c-byday"></div></div>
-    <div class="card"><h2>Most recent hours</h2><div id="c-byhour"></div></div>
+    <div class="card"><header><h2>Session demand</h2></header><div id="c-sessions"></div></div>
+    <div class="card"><header><h2>Speaker interest</h2></header><div id="c-speakers"></div></div>
+    <div class="card"><header><h2>Links clicked</h2></header><div id="c-outbound"></div></div>
+    <div class="card"><header><h2>Filters used</h2></header><div id="c-filters"></div></div>
+    <div class="card"><header><h2>Tabs used</h2></header><div id="c-tabs"></div></div>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-x" data-close aria-label="Close">&times;</button>
+    <h2 id="modal-title"></h2>
+    <div id="modal-body"></div>
   </div>
 </div>
 
@@ -87,51 +135,185 @@ a{color:var(--orange)}
 <script>
 var NAMES = window.IFC_NAMES || {};
 var KEY = 'ifc_analytics_url';
+var EVENT_DAY = '2026-09-02';       // the Pop-Up itself
+var EVENT_HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+var TOP_N = 5;
+var data = null, gran = 'day', timer = null, auto = true;
 
 function url(){ return localStorage.getItem(KEY) || ''; }
 function askUrl(){
   var v = prompt('Paste the Apps Script web-app URL (ends in /exec):', url() || '');
   if(v){ localStorage.setItem(KEY, v.trim()); load(); }
 }
-
+function esc(s){
+  return String(s).replace(/[&<>"]/g, function(c){
+    return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c];
+  });
+}
 function pretty(s){
   if(NAMES[s]) return NAMES[s];
-  return String(s || '(none)')
-    .replace(/^session-/, 'Session ')
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+  return String(s || '(none)').replace(/^session-/, 'Session ')
+    .replace(/-/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
 }
+function sum(rows){ return (rows || []).reduce(function(a, r){ return a + r.count; }, 0); }
 
-function bars(el, rows, opts){
-  opts = opts || {};
-  var host = document.getElementById(el);
-  if(!rows || !rows.length){ host.innerHTML = '<p class="empty">Nothing yet.</p>'; return; }
-  var list = opts.tail ? rows.slice(-12) : rows.slice(0, 12);
-  var max = Math.max.apply(null, list.map(function(r){ return r.count; })) || 1;
-  host.innerHTML = list.map(function(r){
+/* ---------------- ranked bar lists, top N with a "see all" popup -------- */
+function rowsHtml(rows, raw){
+  var max = Math.max.apply(null, rows.map(function(r){ return r.count; })) || 1;
+  return rows.map(function(r){
+    var label = raw ? r.name : pretty(r.name);
     var pct = Math.round(r.count / max * 100);
-    var label = opts.raw ? r.name : pretty(r.name);
     return '<div class="row"><div class="label" title="' + esc(label) + '">' +
       esc(label) + '</div><div class="n">' + r.count + '</div>' +
       '<div class="track"><div class="fill" style="width:' + pct + '%"></div></div></div>';
   }).join('');
 }
 
-function esc(s){
-  return String(s).replace(/[&<>"]/g, function(c){
-    return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c];
+function bars(el, rows, opts){
+  opts = opts || {};
+  var host = document.getElementById(el);
+  if(!rows || !rows.length){ host.innerHTML = '<p class="empty">Nothing yet.</p>'; return; }
+  var limit = opts.all ? rows.length : TOP_N;
+  var html = rowsHtml(rows.slice(0, limit), opts.raw);
+  if(!opts.all && rows.length > TOP_N){
+    html += '<div class="more"><button class="ghost" data-all="' + el + '">' +
+      'See all ' + rows.length + '</button></div>';
+  }
+  host.innerHTML = html;
+}
+
+var TITLES = { 'c-sessions':'Session demand', 'c-speakers':'Speaker interest',
+               'c-outbound':'Links clicked', 'c-filters':'Filters used',
+               'c-tabs':'Tabs used' };
+var SERIES = {};
+
+document.addEventListener('click', function(ev){
+  var t = ev.target;
+  if(!t.closest) return;
+  var btn = t.closest('[data-all]');
+  if(btn){
+    var el = btn.getAttribute('data-all');
+    document.getElementById('modal-title').textContent =
+      TITLES[el] + ' — all ' + SERIES[el].rows.length;
+    document.getElementById('modal-body').innerHTML =
+      rowsHtml(SERIES[el].rows, SERIES[el].raw);
+    document.getElementById('modal').hidden = false;
+    return;
+  }
+  if(t.closest('[data-close]')) document.getElementById('modal').hidden = true;
+});
+document.addEventListener('keydown', function(ev){
+  if(ev.key === 'Escape') document.getElementById('modal').hidden = true;
+});
+
+function show(el, rows, raw){
+  SERIES[el] = { rows: rows || [], raw: !!raw };
+  bars(el, rows, { raw: raw });
+}
+
+/* ---------------- time series ------------------------------------------ */
+function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+/** "2026-09-02 08" buckets -> the series the chosen granularity needs,
+ *  with empty slots filled in so gaps read as zero rather than vanishing. */
+function timeSeries(byHour, mode){
+  var map = {};
+  (byHour || []).forEach(function(r){ map[r.name] = r.count; });
+
+  if(mode === 'event'){
+    return EVENT_HOURS.map(function(h){
+      return { name: pad(h) + ':00', count: map[EVENT_DAY + ' ' + pad(h)] || 0 };
+    });
+  }
+
+  if(mode === 'day'){
+    var days = {};
+    Object.keys(map).forEach(function(k){
+      var d = k.slice(0, 10);
+      days[d] = (days[d] || 0) + map[k];
+    });
+    var keys = Object.keys(days).sort();
+    if(!keys.length) return [];
+    var out = [], cur = new Date(keys[0] + 'T00:00:00');
+    var end = new Date(keys[keys.length - 1] + 'T00:00:00');
+    while(cur <= end){
+      var k = cur.getFullYear() + '-' + pad(cur.getMonth() + 1) + '-' + pad(cur.getDate());
+      out.push({ name: k.slice(5), count: days[k] || 0 });
+      cur.setDate(cur.getDate() + 1);
+    }
+    return out;
+  }
+
+  // hourly: the most recent 48 hours, gaps filled
+  var hk = Object.keys(map).sort();
+  if(!hk.length) return [];
+  var last = hk[hk.length - 1];
+  var end2 = new Date(last.slice(0, 10) + 'T' + last.slice(11) + ':00:00');
+  var res = [];
+  for(var i = 47; i >= 0; i--){
+    var d2 = new Date(end2.getTime() - i * 3600000);
+    var key = d2.getFullYear() + '-' + pad(d2.getMonth() + 1) + '-' + pad(d2.getDate()) +
+      ' ' + pad(d2.getHours());
+    res.push({ name: pad(d2.getDate()) + '/' + pad(d2.getMonth() + 1) + ' ' +
+      pad(d2.getHours()) + 'h', count: map[key] || 0 });
+  }
+  return res;
+}
+
+function chart(el, series){
+  var host = document.getElementById(el);
+  if(!series.length){ host.innerHTML = '<p class="empty">No visits recorded yet.</p>'; return; }
+
+  var W = 1000, H = 240, L = 34, R = 6, T = 12, B = 34;
+  var iw = W - L - R, ih = H - T - B;
+  var max = Math.max.apply(null, series.map(function(d){ return d.count; })) || 1;
+  var step = iw / series.length;
+  var bw = Math.max(2, Math.min(46, step * 0.68));
+  // Label roughly every Nth so they never collide.
+  var every = Math.ceil(series.length / 14);
+
+  var parts = [];
+  [0, 0.5, 1].forEach(function(f){
+    var y = T + ih - ih * f;
+    parts.push('<line x1="' + L + '" y1="' + y.toFixed(1) + '" x2="' + (W - R) +
+      '" y2="' + y.toFixed(1) + '"/>');
+    parts.push('<text x="' + (L - 6) + '" y="' + (y + 4).toFixed(1) +
+      '" text-anchor="end">' + Math.round(max * f) + '</text>');
   });
+  series.forEach(function(d, i){
+    var h = d.count / max * ih;
+    var x = L + step * i + (step - bw) / 2;
+    parts.push('<rect class="b" x="' + x.toFixed(1) + '" y="' + (T + ih - h).toFixed(1) +
+      '" width="' + bw.toFixed(1) + '" height="' + Math.max(h, d.count ? 1.5 : 0).toFixed(1) +
+      '" rx="2"><title>' + esc(d.name) + ': ' + d.count + '</title></rect>');
+    if(i % every === 0){
+      parts.push('<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 12) +
+        '" text-anchor="middle">' + esc(d.name) + '</text>');
+    }
+  });
+  host.innerHTML = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H +
+    '" preserveAspectRatio="none" role="img" aria-label="Visits over time">' +
+    parts.join('') + '</svg>';
 }
 
-function sum(rows){
-  return (rows || []).reduce(function(a, r){ return a + r.count; }, 0);
+function drawTime(){
+  if(!data) return;
+  chart('c-time', timeSeries(data.visitsByHour, gran));
 }
 
-var timer = null, auto = true;
+document.getElementById('gran').addEventListener('click', function(ev){
+  var b = ev.target.closest('button[data-g]');
+  if(!b) return;
+  gran = b.getAttribute('data-g');
+  [].forEach.call(this.querySelectorAll('button'), function(x){
+    x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+  });
+  drawTime();
+});
 
+/* ---------------- load ------------------------------------------------- */
 function load(){
-  var u = url();
-  var err = document.getElementById('error');
+  var u = url(), err = document.getElementById('error');
   if(!u){
     err.innerHTML = '<div class="err">No backend URL set yet. Click ' +
       '<b>Change URL</b> and paste the Apps Script web-app URL from ' +
@@ -145,18 +327,20 @@ function load(){
         { redirect: 'follow' })
     .then(function(r){ return r.json(); })
     .then(function(d){
-      err.innerHTML = '';
+      data = d; err.innerHTML = '';
       document.getElementById('t-visits').textContent = d.visits || 0;
       document.getElementById('t-unique').textContent = d.uniqueVisits || 0;
       document.getElementById('t-sessions').textContent = sum(d.sessions);
       document.getElementById('t-speakers').textContent = sum(d.speakers);
       document.getElementById('t-tickets').textContent = (d.clicks && d.clicks.ticket) || 0;
-      bars('c-sessions', d.sessions);
-      bars('c-speakers', d.speakers);
-      bars('c-tabs', d.tabs, { raw: true });
-      bars('c-filters', d.filters, { raw: true });
-      bars('c-byday', d.byDay, { raw: true, tail: true });
-      bars('c-byhour', d.byHour, { raw: true, tail: true });
+      document.getElementById('t-out').textContent =
+        ((d.clicks && d.clicks.outbound) || 0) + ((d.clicks && d.clicks.linkedin) || 0);
+      show('c-sessions', d.sessions);
+      show('c-speakers', d.speakers);
+      show('c-outbound', d.outbound, true);
+      show('c-filters', d.filters, true);
+      show('c-tabs', d.tabs, true);
+      drawTime();
       document.getElementById('sub').textContent =
         'Updated ' + new Date().toLocaleTimeString() + ' — ' +
         (d.total || 0) + ' events recorded in total.';
@@ -177,6 +361,7 @@ document.getElementById('refresh').addEventListener('click', load);
 document.getElementById('seturl').addEventListener('click', askUrl);
 document.getElementById('auto').addEventListener('click', function(){
   auto = !auto;
+  this.setAttribute('aria-pressed', auto ? 'true' : 'false');
   this.textContent = 'Auto-refresh: ' + (auto ? 'on' : 'off');
   if(auto){ timer = setInterval(load, 60000); } else { clearInterval(timer); }
 });

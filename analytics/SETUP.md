@@ -4,10 +4,18 @@ Fifteen minutes, once. Nothing is tracked until step 5.
 
 ## What this measures
 
-Which **sessions** and **speaker profiles** people open, which **tabs** and
-**filters** they use, and how many **ticket clicks** the site produces. That is
-demand data you can act on — which rooms will overflow, whose profile everyone is
-reading — not demographics.
+- **Session demand** — which sessions get opened, ranked
+- **Speaker interest** — whose profile gets opened, ranked
+- **Every outbound link click**, labelled by what the visitor saw: individual
+  sponsors, the train schedule, Google/Apple Maps, ShawnLife, and LinkedIn
+  clicks recorded by *whose* profile it was
+- **Tabs and filters** used
+- **Visits over time**, as one hourly series the dashboard rolls up to daily,
+  zooms to the last 48 hours, or focuses on the event day itself (07:00–18:00
+  on 2 September)
+
+That is demand data you can act on — which rooms will overflow, whose profile
+everyone is reading — not demographics.
 
 ## What it deliberately does not do
 
@@ -83,6 +91,11 @@ While `ANALYTICS_URL` is `None`, **no tracking code is written into
 
 Open `analytics/dashboard.html` in your browser. Click **Change URL**, paste the
 same `/exec` URL, and it will load. It refreshes every 60 seconds.
+
+The ranked lists show the top 5; **See all** opens the full list in a pop-up.
+The chart has three views — **Hourly** (last 48 hours), **Daily**, and
+**Event day** (07:00–18:00 on 2 September). If the event date ever moves, change
+`EVENT_DAY` near the top of the dashboard's script.
 
 If the browser blocks it from a `file://` page, run this in the `analytics`
 folder and open <http://localhost:8000/dashboard.html>:

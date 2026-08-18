@@ -6,13 +6,18 @@ Fifteen minutes, once. Nothing is tracked until step 5.
 
 - **Session demand** - which sessions get opened, ranked
 - **Speaker interest** - whose profile gets opened, ranked
-- **Every outbound link click**, labelled by what the visitor saw: individual
-  sponsors, the train schedule, Google/Apple Maps, ShawnLife, and LinkedIn
-  clicks recorded by *whose* profile it was
+- **LinkedIn clicks**, credited to whichever speaker's profile it was
+- **Sponsor clicks**, credited to whichever sponsor logo it was
+- **Ticket clicks** and **ShawnLife credit clicks** each as their own count
+- **Other outbound clicks** (the Info tab's map and train-schedule links) kept
+  separately so nothing is silently dropped, but not treated as one of the
+  main tracked categories
 - **Tabs and filters** used
+- **Bounce rate**: the share of visits where someone loaded the page and left
+  without tapping anything else at all
 - **Visits over time**, as one hourly series the dashboard rolls up to daily,
-  zooms to the last 48 hours, or focuses on the event day itself (07:00–18:00
-  on 2 September)
+  zooms to the last 48 hours, focuses on the event day itself (07:00-18:00 on
+  2 September), or a custom date range you pick
 
 That is demand data you can act on - which rooms will overflow, whose profile
 everyone is reading - not demographics.
@@ -112,6 +117,22 @@ python3 -m http.server
 ```
 
 ---
+
+## Redeploying after an update to apps_script.js
+
+The new dashboard (bounce rate, LinkedIn clicked, sponsor clicked, ShawnLife
+clicks) reads fields this script only started producing once sponsor/shawnlife
+became their own event types. **If you are on an older paste of this script,
+those tiles and cards will read zero even if real data exists**, because it is
+sitting under the old `outbound`/`linkedin` shape instead. Paste the current `apps_script.js` in and redeploy (see below) to pick it up.
+
+Nothing is lost either way, but be aware of one wrinkle: sponsor and
+ShawnLife clicks recorded *before* this update were stored as generic
+`outbound` events, since those were not their own category yet. After
+redeploying, those old rows will keep showing under "Other links" rather than
+moving into the new Sponsor/ShawnLife boxes retroactively; only clicks from
+after the redeploy get sorted correctly. Session, speaker, tab, filter and
+ticket data is unaffected and reads identically either way.
 
 ## Notes
 

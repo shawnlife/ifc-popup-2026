@@ -16,13 +16,13 @@
  */
 
 var SHEET_NAME = 'Events';
-var CACHE_KEY = 'summary_v1';
+var CACHE_KEY = 'summary_v2';
 var CACHE_SECONDS = 60;      // dashboard reads are cheap and near-live
 
 // Only these event types are accepted. Anything else is dropped, so a stray
 // script posting junk cannot invent new columns of noise.
 var ALLOWED = ['visit', 'tab', 'session', 'speaker', 'filter', 'ticket',
-               'linkedin', 'outbound'];
+               'linkedin', 'sponsor', 'shawnlife', 'outbound'];
 var MAX_EVENTS_PER_POST = 60;
 var MAX_TARGET_LEN = 80;
 
@@ -89,31 +89,44 @@ function doGet(e) {
 }
 
 
+function emptySummary_() {
+  return {
+    generated: new Date().toISOString(), total: 0, visits: 0, uniqueVisits: 0,
+    bouncedVisits: 0, bounceRate: 0, engagedRate: 0,
+    sessions: [], speakers: [], tabs: [], filters: [], linkedinClicks: [],
+    sponsorClicks: [], outbound: [], visitsByHour: [],
+    clicks: { ticket: 0, linkedin: 0, sponsor: 0, shawnlife: 0, outbound: 0 }
+  };
+}
+
+
 function buildSummary_() {
   var sh = sheet_();
   var last = sh.getLastRow();
-  if (last < 2) {
-    return { generated: new Date().toISOString(), total: 0, visits: 0,
-             uniqueVisits: 0, sessions: [], speakers: [], tabs: [], filters: [],
-             outbound: [], visitsByHour: [],
-             clicks: { ticket: 0, linkedin: 0, outbound: 0 } };
-  }
+  if (last < 2) return emptySummary_();
 
   var values = sh.getRange(2, 1, last - 1, 4).getValues();
-  var sessions = {}, speakers = {}, tabs = {}, filters = {}, outbound = {};
-  var visitsByHour = {}, sids = {};
-  var clicks = { ticket: 0, linkedin: 0, outbound: 0 };
+  var sessions = {}, speakers = {}, tabs = {}, filters = {};
+  var linkedinClicks = {}, sponsorClicks = {}, outbound = {};
+  var visitsByHour = {};
+  var clicks = { ticket: 0, linkedin: 0, sponsor: 0, shawnlife: 0, outbound: 0 };
   var total = 0, visits = 0;
   var tz = Session.getScriptTimeZone();
+
+  // Per-visit (per sid) event counts, to work out how many visits recorded
+  // nothing beyond the initial 'visit' event itself: someone who loaded the
+  // page and left without tapping anything, i.e. a bounce.
+  var perSid = {};
 
   for (var i = 0; i < values.length; i++) {
     var ts = values[i][0], sid = values[i][1], type = values[i][2], target = values[i][3];
     if (!type) continue;
     total++;
-    if (sid) sids[sid] = 1;
+    if (sid) perSid[sid] = (perSid[sid] || 0) + 1;
 
-    // One full hourly series of visits. The dashboard rolls it up to days or
-    // zooms into the event day itself, so only one series has to be sent.
+    // One full hourly series of visits. The dashboard rolls it up to days,
+    // zooms into the event day, or filters a custom range, so only one
+    // series needs to be sent; it does all of that client-side.
     if (ts instanceof Date && type === 'visit') {
       var hour = Utilities.formatDate(ts, tz, 'yyyy-MM-dd HH');
       visitsByHour[hour] = (visitsByHour[hour] || 0) + 1;
@@ -125,11 +138,14 @@ function buildSummary_() {
     else if (type === 'tab') tabs[target] = (tabs[target] || 0) + 1;
     else if (type === 'filter') filters[target] = (filters[target] || 0) + 1;
     else if (type === 'ticket') clicks.ticket++;
+    else if (type === 'shawnlife') clicks.shawnlife++;
     else if (type === 'linkedin') {
       clicks.linkedin++;
-      speakers[target] = speakers[target] || 0;   // keep zero-open profiles listed
-      outbound['LinkedIn: ' + (target || 'unknown')] =
-        (outbound['LinkedIn: ' + (target || 'unknown')] || 0) + 1;
+      linkedinClicks[target || '(unknown)'] = (linkedinClicks[target || '(unknown)'] || 0) + 1;
+    }
+    else if (type === 'sponsor') {
+      clicks.sponsor++;
+      sponsorClicks[target || '(unknown)'] = (sponsorClicks[target || '(unknown)'] || 0) + 1;
     }
     else if (type === 'outbound') {
       clicks.outbound++;
@@ -137,16 +153,29 @@ function buildSummary_() {
     }
   }
 
+  var sidList = Object.keys(perSid);
+  var bounced = 0;
+  for (var s = 0; s < sidList.length; s++) {
+    if (perSid[sidList[s]] <= 1) bounced++;   // only the 'visit' event itself
+  }
+  var uniqueVisits = sidList.length;
+  var bounceRate = uniqueVisits ? Math.round((bounced / uniqueVisits) * 100) : 0;
+
   return {
     generated: new Date().toISOString(),
     total: total,
     visits: visits,
-    uniqueVisits: Object.keys(sids).length,
+    uniqueVisits: uniqueVisits,
+    bouncedVisits: bounced,
+    bounceRate: bounceRate,
+    engagedRate: 100 - bounceRate,
     clicks: clicks,
     sessions: rank_(sessions),
     speakers: rank_(speakers),
     tabs: rank_(tabs),
     filters: rank_(filters),
+    linkedinClicks: rank_(linkedinClicks),
+    sponsorClicks: rank_(sponsorClicks),
     outbound: rank_(outbound),
     visitsByHour: rank_(visitsByHour, true)
   };

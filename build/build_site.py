@@ -602,6 +602,9 @@ TRACK_JS = """
       track('linkedin', who);
       return;
     }
+    if(a.closest('.sponsors')){ track('sponsor', outLabel(a)); return; }
+    if(a.closest('footer .credit')){ track('shawnlife', ''); return; }
+    // Whatever is left: the Info tab's map and train-schedule links.
     track('outbound', outLabel(a));
   });
   track('visit', '');

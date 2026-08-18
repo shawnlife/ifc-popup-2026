@@ -101,14 +101,18 @@ GitHub Pages picks it up within a minute or two.
 Live. Full walkthrough in `analytics/SETUP.md`.
 
 Records which sessions and speaker profiles get opened, which tabs and filters
-get used, and every outbound link click (sponsors, train schedule, maps,
-LinkedIn by whose profile). No cookies, nothing stored on the visitor's device,
-no IP or demographic data - so **no consent banner is needed**. Turn it off by
-setting `ANALYTICS_URL = None` in `site_data.py`; the tracking code then isn't
-written into the page at all.
+get used, sponsor clicks and LinkedIn clicks as their own categories (credited
+to which sponsor or speaker), ticket and ShawnLife-credit clicks, and bounce
+rate (visits that tapped nothing at all). No cookies, nothing stored on the
+visitor's device, no IP or demographic data - so **no consent banner is
+needed**. Turn it off by setting `ANALYTICS_URL = None` in `site_data.py`; the
+tracking code then isn't written into the page at all.
 
-`analytics/dashboard.html` is the local dashboard - open it, click **Change
-URL**, paste the Apps Script `/exec` URL. Refreshes every 60 seconds.
+`analytics/dashboard.html` is the local dashboard: hover a bar on the chart
+for its exact count, switch between Hourly/Daily/Event day/Custom range, and
+expand "What counts as what" for plain-English definitions of every metric.
+Refreshes automatically every 60 seconds; the only setup step is a one-time
+"Change it" link at the bottom to paste the Apps Script `/exec` URL.
 
 **Browsing the live site yourself?** Use
 `https://ifc.shawnlife.com/?shawn` - that suppresses tracking entirely for

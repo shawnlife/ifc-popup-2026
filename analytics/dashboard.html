@@ -13,41 +13,81 @@
 [hidden]{display:none !important}
 :root{
   --orange:#F49404;--bg:#303249;--surface:#3D3F5A;--surface-2:#474A69;
-  --text:#fff;--muted:#CDD0E4;--line:rgba(255,255,255,.10);
+  --text:#fff;--muted:#CDD0E4;--line:rgba(255,255,255,.10);--good:#7BC67E;--bad:#E38686;
 }
 body{margin:0;background:var(--bg);color:var(--text);
   font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   font-size:15px;line-height:1.5}
-.wrap{max-width:1150px;margin:0 auto;padding:22px 16px 60px}
-h1{margin:0 0 4px;font-size:1.3rem;text-transform:uppercase;letter-spacing:.02em}
+.wrap{max-width:1150px;margin:0 auto;padding:22px 16px 50px}
+.head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 4px}
+h1{margin:0;font-size:1.3rem;text-transform:uppercase;letter-spacing:.02em}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--good)}
+.live .dot{width:7px;height:7px;border-radius:50%;background:var(--good);
+  animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.live .dot{animation:none}}
 .sub{margin:0 0 20px;color:var(--muted);font-size:.85rem}
-.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 22px}
-button{
-  font-family:inherit;font-size:.8rem;font-weight:700;text-transform:uppercase;
-  letter-spacing:.05em;min-height:42px;padding:0 16px;border-radius:999px;cursor:pointer;
-  border:1px solid var(--orange);background:var(--orange);color:#241f10;
-}
-button.ghost{background:none;color:var(--muted);border-color:rgba(255,255,255,.2)}
-button.ghost:hover{color:#fff;border-color:#fff}
-button.ghost[aria-pressed=true]{background:var(--orange);border-color:var(--orange);color:#241f10}
-button:disabled{opacity:.5;cursor:default}
-.tiles{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 18px}
-@media(min-width:760px){.tiles{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.err{background:#5a2320;border:1px solid #a3413a;border-radius:12px;padding:14px 16px;
+  margin:0 0 18px;font-size:.88rem}
+.err code{background:rgba(0,0,0,.3);padding:1px 5px;border-radius:4px}
+
+.tiles{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 20px}
+@media(min-width:640px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:900px){.tiles{grid-template-columns:repeat(6,minmax(0,1fr))}}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.tile b{display:block;font-size:1.6rem;line-height:1.1;font-variant-numeric:tabular-nums}
-.tile span{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em}
+.tile b{display:block;font-size:1.5rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile span{color:var(--muted);font-size:.66rem;text-transform:uppercase;letter-spacing:.07em}
+.tile.rate b.good{color:var(--good)}
+.tile.rate b.bad{color:var(--bad)}
+
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;
   padding:16px 18px;margin:0 0 14px}
 .card header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
-  justify-content:space-between;margin:0 0 14px}
-.card h2{margin:0;font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;
+  justify-content:space-between;margin:0 0 6px}
+.card h2{margin:0;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;
   color:var(--orange)}
+.card h2 small{color:var(--muted);font-weight:400;letter-spacing:0;
+  text-transform:none;font-size:.95em}
+
+button{
+  font-family:inherit;font-size:.72rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;min-height:34px;padding:0 13px;border-radius:999px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.2);background:none;color:var(--muted);
+}
+button[aria-pressed=true]{background:var(--orange);border-color:var(--orange);color:#241f10}
+button:hover{color:#fff;border-color:#fff}
+button[aria-pressed=true]:hover{color:#241f10;border-color:var(--orange)}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
-.seg button{min-height:34px;padding:0 12px;font-size:.7rem}
+
+.range-note{margin:0 0 10px;color:var(--muted);font-size:.78rem}
+.custom-range{display:none;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 14px;
+  font-size:.8rem;color:var(--muted)}
+.custom-range.on{display:flex}
+.custom-range input{
+  font-family:inherit;font-size:.82rem;background:rgba(0,0,0,.2);color:var(--text);
+  border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:7px 10px;min-height:34px;
+}
+.chart-wrap{position:relative}
+svg.chart{display:block;width:100%;height:auto}
+svg.chart .b{fill:var(--orange);cursor:pointer}
+svg.chart .b:hover,svg.chart .b.hot{fill:#ffb340}
+svg.chart .b.zero{fill:rgba(255,255,255,.08)}
+svg.chart text{fill:var(--muted);font-size:11px;font-family:inherit}
+svg.chart .datelabel{font-size:10px;fill:var(--muted);opacity:.85}
+svg.chart line.grid{stroke:rgba(255,255,255,.12)}
+svg.chart line.daydiv{stroke:rgba(255,255,255,.28);stroke-dasharray:2 3}
+.tooltip{
+  position:absolute;pointer-events:none;background:#181927;border:1px solid rgba(255,255,255,.18);
+  border-radius:8px;padding:6px 10px;font-size:.78rem;white-space:nowrap;z-index:5;
+  transform:translate(-50%,-115%);box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+.tooltip b{color:var(--orange);font-variant-numeric:tabular-nums}
+
 .grid{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
 @media(min-width:860px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .grid .card{margin:0}
-.row{display:grid;grid-template-columns:minmax(0,1fr) 52px;gap:10px;align-items:center;
+.row{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:10px;align-items:center;
   padding:5px 0}
 .row .label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   font-size:.85rem}
@@ -56,17 +96,26 @@ button:disabled{opacity:.5;cursor:default}
   overflow:hidden;margin-top:-2px}
 .fill{height:100%;background:var(--orange);border-radius:4px}
 .more{margin-top:10px}
-.more button{min-height:36px;padding:0 14px;font-size:.7rem}
-.empty{color:var(--muted);font-size:.85rem;font-style:italic}
-.err{background:#5a2320;border:1px solid #a3413a;border-radius:12px;padding:14px 16px;
-  margin:0 0 18px;font-size:.88rem}
-.err code{background:rgba(0,0,0,.3);padding:1px 5px;border-radius:4px}
-svg.chart{display:block;width:100%;height:auto}
-svg.chart .b{fill:var(--orange)}
-svg.chart .b:hover{fill:#ffb340}
-svg.chart text{fill:var(--muted);font-size:11px;font-family:inherit}
-svg.chart line{stroke:rgba(255,255,255,.12)}
-/* full-list popup */
+.more button{min-height:32px;padding:0 13px}
+.empty{color:var(--muted);font-size:.85rem;font-style:italic;margin:4px 0}
+
+.other-card{margin-top:0}
+.other-card h2{color:var(--muted)}
+
+details.legend{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:14px 18px;margin:6px 0 0}
+details.legend summary{cursor:pointer;font-size:.82rem;font-weight:700;color:var(--orange);
+  text-transform:uppercase;letter-spacing:.06em;list-style:none}
+details.legend summary::-webkit-details-marker{display:none}
+details.legend summary::before{content:'+ ';display:inline-block}
+details.legend[open] summary::before{content:'- '}
+.legend dl{margin:14px 0 0;display:grid;gap:10px}
+.legend dt{font-weight:700;font-size:.85rem;color:var(--text)}
+.legend dd{margin:2px 0 0;color:var(--muted);font-size:.83rem;line-height:1.5}
+
+.fineprint{margin:22px 0 0;text-align:center;font-size:.76rem;color:var(--muted);opacity:.7}
+.fineprint a{color:var(--muted)}
+
 .modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;
   justify-content:center;padding:20px}
 .modal-bg{position:absolute;inset:0;background:rgba(16,17,26,.75)}
@@ -83,45 +132,89 @@ a{color:var(--orange)}
 </head>
 <body>
 <div class="wrap">
-  <h1>IFC Pop-Up 2026: Usage</h1>
-  <p class="sub" id="sub">Loading&hellip;</p>
-
-  <div class="bar">
-    <button id="refresh">Refresh</button>
-    <button class="ghost" id="auto" aria-pressed="true">Auto-refresh: on</button>
-    <button class="ghost" id="seturl">Change URL</button>
+  <div class="head">
+    <h1>IFC Pop-Up 2026: Usage</h1>
+    <span class="live"><span class="dot" aria-hidden="true"></span>Live</span>
   </div>
+  <p class="sub" id="sub">Loading&hellip;</p>
 
   <div id="error"></div>
 
   <div class="tiles">
     <div class="tile"><b id="t-visits">&hellip;</b><span>Visits</span></div>
-    <div class="tile"><b id="t-unique">&hellip;</b><span>Unique loads</span></div>
-    <div class="tile"><b id="t-sessions">&hellip;</b><span>Session opens</span></div>
-    <div class="tile"><b id="t-speakers">&hellip;</b><span>Profile opens</span></div>
+    <div class="tile rate"><b id="t-bounce">&hellip;</b><span>Bounce rate</span></div>
     <div class="tile"><b id="t-tickets">&hellip;</b><span>Ticket clicks</span></div>
-    <div class="tile"><b id="t-out">&hellip;</b><span>Outbound clicks</span></div>
+    <div class="tile"><b id="t-shawnlife">&hellip;</b><span>ShawnLife clicks</span></div>
+    <div class="tile"><b id="t-linkedin">&hellip;</b><span>LinkedIn clicks</span></div>
+    <div class="tile"><b id="t-sponsor">&hellip;</b><span>Sponsor clicks</span></div>
   </div>
 
   <div class="card">
     <header>
       <h2>Visits over time</h2>
       <div class="seg" id="gran">
-        <button class="ghost" data-g="hour" aria-pressed="false">Hourly</button>
-        <button class="ghost" data-g="day" aria-pressed="true">Daily</button>
-        <button class="ghost" data-g="event" aria-pressed="false">Event day</button>
+        <button data-g="hour" aria-pressed="false">Hourly</button>
+        <button data-g="day" aria-pressed="true">Daily</button>
+        <button data-g="event" aria-pressed="false">Event day</button>
+        <button data-g="custom" aria-pressed="false">Custom</button>
       </div>
     </header>
-    <div id="c-time"></div>
+    <p class="range-note" id="range-note"></p>
+    <div class="custom-range" id="custom-range">
+      <label>From <input type="date" id="custom-from"></label>
+      <label>To <input type="date" id="custom-to"></label>
+    </div>
+    <div class="chart-wrap">
+      <div id="c-time"></div>
+      <div class="tooltip" id="tooltip" hidden></div>
+    </div>
   </div>
 
   <div class="grid">
-    <div class="card"><header><h2>Session demand</h2></header><div id="c-sessions"></div></div>
-    <div class="card"><header><h2>Speaker interest</h2></header><div id="c-speakers"></div></div>
-    <div class="card"><header><h2>Links clicked</h2></header><div id="c-outbound"></div></div>
+    <div class="card"><header><h2 id="h-sessions">Session demand</h2></header>
+      <div id="c-sessions"></div></div>
+    <div class="card"><header><h2 id="h-speakers">Speaker interest</h2></header>
+      <div id="c-speakers"></div></div>
+
     <div class="card"><header><h2>Filters used</h2></header><div id="c-filters"></div></div>
     <div class="card"><header><h2>Tabs used</h2></header><div id="c-tabs"></div></div>
+
+    <div class="card"><header><h2 id="h-linkedin">LinkedIn clicked</h2></header>
+      <div id="c-linkedin"></div></div>
+    <div class="card"><header><h2 id="h-sponsor">Sponsor clicked</h2></header>
+      <div id="c-sponsor"></div></div>
   </div>
+
+  <div class="card other-card">
+    <header><h2>Other links (maps, train schedule)</h2></header>
+    <div id="c-outbound"></div>
+  </div>
+
+  <details class="legend">
+    <summary>What counts as what</summary>
+    <dl>
+      <dt>Visits</dt>
+      <dd>One per page load. Reloading or reopening the site counts as a new visit.</dd>
+      <dt>Bounce rate</dt>
+      <dd>The share of visits where someone loaded the page and left without tapping
+        anything else at all, not even switching tabs.</dd>
+      <dt>Session demand</dt>
+      <dd>Counts a session as opened only when someone taps into it: a title on the
+        Schedule tab, or a "Speaking in" link on a speaker's profile. Scrolling past a
+        card on the Sessions tab without tapping it is not counted.</dd>
+      <dt>Speaker interest</dt>
+      <dd>Counts each time a speaker's profile pop-up is opened, from any tab.</dd>
+      <dt>Filters used / Tabs used</dt>
+      <dd>Each time a Sessions-tab filter is changed, or a tab is switched.</dd>
+      <dt>LinkedIn clicked / Sponsor clicked</dt>
+      <dd>Each tap on a speaker's LinkedIn button, or a sponsor logo, credited to
+        whichever speaker or sponsor it was.</dd>
+      <dt>Ticket clicks / ShawnLife clicks</dt>
+      <dd>Taps on the Get Your Tickets button, or the ShawnLife credit in the footer.</dd>
+    </dl>
+  </details>
+
+  <p class="fineprint">Reading from a configured source. <a href="#" id="seturl">Change it</a></p>
 </div>
 
 <div class="modal" id="modal" hidden>
@@ -142,13 +235,9 @@ var KEY = 'ifc_analytics_url';
 var EVENT_DAY = '2026-09-02';       // the Pop-Up itself
 var EVENT_HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 var TOP_N = 5;
-var data = null, gran = 'day', timer = null, auto = true;
+var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var data = null, gran = 'day';
 
-function url(){ return localStorage.getItem(KEY) || ''; }
-function askUrl(){
-  var v = prompt('Paste the Apps Script web-app URL (ends in /exec):', url() || '');
-  if(v){ localStorage.setItem(KEY, v.trim()); load(); }
-}
 function esc(s){
   return String(s).replace(/[&<>"]/g, function(c){
     return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c];
@@ -160,6 +249,18 @@ function pretty(s){
     .replace(/-/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
 }
 function sum(rows){ return (rows || []).reduce(function(a, r){ return a + r.count; }, 0); }
+function pad(n){ return n < 10 ? '0' + n : '' + n; }
+function dateStr(y, m, d){ return d + ' ' + MONTHS[m] + ' ' + y; }
+
+/* ---------------- source URL: one-time setup, tucked away after that ---- */
+function url(){ return localStorage.getItem(KEY) || ''; }
+function askUrl(){
+  var v = prompt('Paste the Apps Script web-app URL (ends in /exec):', url() || '');
+  if(v){ localStorage.setItem(KEY, v.trim()); load(); }
+}
+document.getElementById('seturl').addEventListener('click', function(ev){
+  ev.preventDefault(); askUrl();
+});
 
 /* ---------------- ranked bar lists, top N with a "see all" popup -------- */
 function rowsHtml(rows, raw){
@@ -180,15 +281,16 @@ function bars(el, rows, opts){
   var limit = opts.all ? rows.length : TOP_N;
   var html = rowsHtml(rows.slice(0, limit), opts.raw);
   if(!opts.all && rows.length > TOP_N){
-    html += '<div class="more"><button class="ghost" data-all="' + el + '">' +
+    html += '<div class="more"><button data-all="' + el + '">' +
       'See all ' + rows.length + '</button></div>';
   }
   host.innerHTML = html;
 }
 
 var TITLES = { 'c-sessions':'Session demand', 'c-speakers':'Speaker interest',
-               'c-outbound':'Links clicked', 'c-filters':'Filters used',
-               'c-tabs':'Tabs used' };
+               'c-outbound':'Other links', 'c-filters':'Filters used',
+               'c-tabs':'Tabs used', 'c-linkedin':'LinkedIn clicked',
+               'c-sponsor':'Sponsor clicked' };
 var SERIES = {};
 
 document.addEventListener('click', function(ev){
@@ -215,18 +317,24 @@ function show(el, rows, raw){
   bars(el, rows, { raw: raw });
 }
 
-/* ---------------- time series ------------------------------------------ */
-function pad(n){ return n < 10 ? '0' + n : '' + n; }
+/* ---------------- time series -------------------------------------------
+   Every point carries both a short axis LABEL (hour, or day) and a
+   dateKey (yyyy-MM-dd) so the chart can tell when a new calendar day
+   starts without re-parsing label text, and put the date on its own
+   marker instead of repeating it on every single bar. */
+function hourPoint(d2, count){
+  return { label: pad(d2.getHours()) + ':00', count: count,
+    dateKey: d2.getFullYear() + '-' + pad(d2.getMonth() + 1) + '-' + pad(d2.getDate()) };
+}
 
-/** "2026-09-02 08" buckets -> the series the chosen granularity needs,
- *  with empty slots filled in so gaps read as zero rather than vanishing. */
-function timeSeries(byHour, mode){
+function timeSeries(byHour, mode, range){
   var map = {};
   (byHour || []).forEach(function(r){ map[r.name] = r.count; });
 
   if(mode === 'event'){
     return EVENT_HOURS.map(function(h){
-      return { name: pad(h) + ':00', count: map[EVENT_DAY + ' ' + pad(h)] || 0 };
+      var d2 = new Date(EVENT_DAY + 'T' + pad(h) + ':00:00');
+      return hourPoint(d2, map[EVENT_DAY + ' ' + pad(h)] || 0);
     });
   }
 
@@ -242,67 +350,171 @@ function timeSeries(byHour, mode){
     var end = new Date(keys[keys.length - 1] + 'T00:00:00');
     while(cur <= end){
       var k = cur.getFullYear() + '-' + pad(cur.getMonth() + 1) + '-' + pad(cur.getDate());
-      out.push({ name: k.slice(5), count: days[k] || 0 });
+      out.push({ label: cur.getDate() + ' ' + MONTHS[cur.getMonth()], count: days[k] || 0,
+        dateKey: k });
       cur.setDate(cur.getDate() + 1);
     }
     return out;
   }
 
-  // hourly: the most recent 48 hours, gaps filled
+  if(mode === 'custom' && range && range.from && range.to){
+    var fromD = new Date(range.from + 'T00:00:00');
+    var toD = new Date(range.to + 'T23:59:59');
+    var spanDays = Math.ceil((toD - fromD) / 86400000);
+    if(spanDays <= 3){
+      var res2 = [];
+      for(var t = fromD.getTime(); t <= toD.getTime(); t += 3600000){
+        var d3 = new Date(t);
+        var key3 = d3.getFullYear() + '-' + pad(d3.getMonth() + 1) + '-' + pad(d3.getDate()) +
+          ' ' + pad(d3.getHours());
+        res2.push(hourPoint(d3, map[key3] || 0));
+      }
+      return res2;
+    }
+    var days2 = {};
+    Object.keys(map).forEach(function(k){
+      var kd = k.slice(0, 10);
+      if(kd >= range.from && kd <= range.to) days2[kd] = (days2[kd] || 0) + map[k];
+    });
+    var out2 = [], cur2 = new Date(range.from + 'T00:00:00');
+    while(cur2 <= toD){
+      var k2 = cur2.getFullYear() + '-' + pad(cur2.getMonth() + 1) + '-' + pad(cur2.getDate());
+      out2.push({ label: cur2.getDate() + ' ' + MONTHS[cur2.getMonth()], count: days2[k2] || 0,
+        dateKey: k2 });
+      cur2.setDate(cur2.getDate() + 1);
+    }
+    return out2;
+  }
+
+  // hourly (default): the most recent 48 hours, gaps filled
   var hk = Object.keys(map).sort();
   if(!hk.length) return [];
   var last = hk[hk.length - 1];
   var end2 = new Date(last.slice(0, 10) + 'T' + last.slice(11) + ':00:00');
   var res = [];
   for(var i = 47; i >= 0; i--){
-    var d2 = new Date(end2.getTime() - i * 3600000);
-    var key = d2.getFullYear() + '-' + pad(d2.getMonth() + 1) + '-' + pad(d2.getDate()) +
-      ' ' + pad(d2.getHours());
-    res.push({ name: pad(d2.getDate()) + '/' + pad(d2.getMonth() + 1) + ' ' +
-      pad(d2.getHours()) + 'h', count: map[key] || 0 });
+    var dd = new Date(end2.getTime() - i * 3600000);
+    var key = dd.getFullYear() + '-' + pad(dd.getMonth() + 1) + '-' + pad(dd.getDate()) +
+      ' ' + pad(dd.getHours());
+    res.push(hourPoint(dd, map[key] || 0));
   }
   return res;
 }
 
-function chart(el, series){
+function rangeNote(series, mode){
+  if(!series.length) return '';
+  if(mode === 'day') return '';   // each bar already carries its own date
+  var first = series[0].dateKey, last = series[series.length - 1].dateKey;
+  if(first === last){
+    var p = first.split('-');
+    return 'Showing ' + dateStr(+p[0], +p[1] - 1, +p[2]) + '.';
+  }
+  var p1 = first.split('-'), p2 = last.split('-');
+  return 'Showing ' + dateStr(+p1[0], +p1[1] - 1, +p1[2]) + ' to ' +
+    dateStr(+p2[0], +p2[1] - 1, +p2[2]) + '.';
+}
+
+/* ---------------- chart, with a hover tooltip and day-boundary markers -- */
+function chart(el, series, dayMarkers){
   var host = document.getElementById(el);
   if(!series.length){ host.innerHTML = '<p class="empty">No visits recorded yet.</p>'; return; }
 
-  var W = 1000, H = 240, L = 34, R = 6, T = 12, B = 34;
+  // Day-boundary markers only make sense on hour-grained series, where one
+  // continuous row of bars can cross midnight. In day-grained series every
+  // bar already IS one day with its own axis label below, so a marker above
+  // every single bar would just repeat that.
+  var hasDates = !!dayMarkers && series.length > 1 && series.some(function(d, i){
+    return i > 0 && d.dateKey !== series[i - 1].dateKey;
+  });
+  var W = 1000, H = hasDates ? 256 : 240, L = 34, R = 6, T = hasDates ? 26 : 12, B = 34;
   var iw = W - L - R, ih = H - T - B;
   var max = Math.max.apply(null, series.map(function(d){ return d.count; })) || 1;
   var step = iw / series.length;
   var bw = Math.max(2, Math.min(46, step * 0.68));
-  // Label roughly every Nth so they never collide.
   var every = Math.ceil(series.length / 14);
 
   var parts = [];
   [0, 0.5, 1].forEach(function(f){
     var y = T + ih - ih * f;
-    parts.push('<line x1="' + L + '" y1="' + y.toFixed(1) + '" x2="' + (W - R) +
+    parts.push('<line class="grid" x1="' + L + '" y1="' + y.toFixed(1) + '" x2="' + (W - R) +
       '" y2="' + y.toFixed(1) + '"/>');
     parts.push('<text x="' + (L - 6) + '" y="' + (y + 4).toFixed(1) +
       '" text-anchor="end">' + Math.round(max * f) + '</text>');
   });
+
   series.forEach(function(d, i){
     var h = d.count / max * ih;
     var x = L + step * i + (step - bw) / 2;
-    parts.push('<rect class="b" x="' + x.toFixed(1) + '" y="' + (T + ih - h).toFixed(1) +
-      '" width="' + bw.toFixed(1) + '" height="' + Math.max(h, d.count ? 1.5 : 0).toFixed(1) +
-      '" rx="2"><title>' + esc(d.name) + ': ' + d.count + '</title></rect>');
+    var isZero = d.count === 0;
+    parts.push('<rect class="b' + (isZero ? ' zero' : '') + '" data-i="' + i +
+      '" x="' + x.toFixed(1) + '" y="' + (T + ih - (isZero ? 1.5 : h)).toFixed(1) +
+      '" width="' + bw.toFixed(1) + '" height="' + Math.max(h, 1.5).toFixed(1) + '" rx="2">' +
+      '<title>' + esc(d.label) + ': ' + d.count + '</title></rect>');
     if(i % every === 0){
       parts.push('<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 12) +
-        '" text-anchor="middle">' + esc(d.name) + '</text>');
+        '" text-anchor="middle">' + esc(d.label) + '</text>');
+    }
+    // A new calendar day starts here: draw a divider and label the date once,
+    // instead of repeating it on every bar's own label underneath.
+    if(hasDates && i > 0 && d.dateKey !== series[i - 1].dateKey){
+      var lx = x - (step - bw) / 2 - 1;
+      parts.push('<line class="daydiv" x1="' + lx.toFixed(1) + '" y1="' + (T - 14) +
+        '" x2="' + lx.toFixed(1) + '" y2="' + (T + ih) + '"/>');
+      var p = d.dateKey.split('-');
+      parts.push('<text class="datelabel" x="' + (lx + 4).toFixed(1) + '" y="' + (T - 4) +
+        '">' + (+p[2]) + ' ' + MONTHS[+p[1] - 1] + '</text>');
     }
   });
+
   host.innerHTML = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H +
     '" preserveAspectRatio="none" role="img" aria-label="Visits over time">' +
     parts.join('') + '</svg>';
+
+  var tip = document.getElementById('tooltip');
+  var svg = host.querySelector('svg');
+  function pos(clientX, clientY){
+    var r = host.getBoundingClientRect();
+    tip.style.left = (clientX - r.left) + 'px';
+    tip.style.top = (clientY - r.top) + 'px';
+  }
+  function show(ev){
+    var rect = ev.target.closest('rect.b');
+    if(!rect) return;
+    var d = series[+rect.getAttribute('data-i')];
+    svg.querySelectorAll('rect.b.hot').forEach(function(r){ r.classList.remove('hot'); });
+    rect.classList.add('hot');
+    tip.innerHTML = esc(d.label) + (d.dateKey ? ' (' + esc(d.dateKey.slice(5)) + ')' : '') +
+      ': <b>' + d.count + '</b>';
+    tip.hidden = false;
+    pos(ev.clientX, ev.clientY);
+  }
+  function hide(){
+    tip.hidden = true;
+    svg.querySelectorAll('rect.b.hot').forEach(function(r){ r.classList.remove('hot'); });
+  }
+  svg.addEventListener('mousemove', show);
+  svg.addEventListener('mouseleave', hide);
+  svg.addEventListener('touchstart', function(ev){
+    var t = ev.touches[0];
+    var el2 = document.elementFromPoint(t.clientX, t.clientY);
+    if(el2){ show({ target: el2, clientX: t.clientX, clientY: t.clientY }); }
+  }, { passive: true });
+}
+
+function customRange(){
+  var from = document.getElementById('custom-from').value;
+  var to = document.getElementById('custom-to').value;
+  return { from: from, to: to };
 }
 
 function drawTime(){
   if(!data) return;
-  chart('c-time', timeSeries(data.visitsByHour, gran));
+  var series = timeSeries(data.visitsByHour, gran, gran === 'custom' ? customRange() : null);
+  document.getElementById('range-note').textContent = rangeNote(series, gran);
+  // Hour-grained labels look like "08:00"; day-grained ones look like "20 Aug".
+  // A day marker above every bar only helps the former.
+  var hourGrained = series.length > 0 && /:/.test(series[0].label);
+  chart('c-time', series, hourGrained);
 }
 
 document.getElementById('gran').addEventListener('click', function(ev){
@@ -312,42 +524,71 @@ document.getElementById('gran').addEventListener('click', function(ev){
   [].forEach.call(this.querySelectorAll('button'), function(x){
     x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
   });
+  var cr = document.getElementById('custom-range');
+  if(gran === 'custom'){
+    cr.classList.add('on');
+    if(!document.getElementById('custom-from').value && data && data.visitsByHour.length){
+      var last = data.visitsByHour[data.visitsByHour.length - 1].name.slice(0, 10);
+      var d = new Date(last + 'T00:00:00');
+      d.setDate(d.getDate() - 6);
+      document.getElementById('custom-from').value =
+        d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      document.getElementById('custom-to').value = last;
+    }
+  } else {
+    cr.classList.remove('on');
+  }
   drawTime();
 });
+document.getElementById('custom-from').addEventListener('change', drawTime);
+document.getElementById('custom-to').addEventListener('change', drawTime);
 
-/* ---------------- load ------------------------------------------------- */
+/* ---------------- load, every 60s, always on --------------------------- */
 function load(){
   var u = url(), err = document.getElementById('error');
   if(!u){
     err.innerHTML = '<div class="err">No backend URL set yet. Click ' +
-      '<b>Change URL</b> and paste the Apps Script web-app URL from ' +
+      '<b>Change it</b> below and paste the Apps Script web-app URL from ' +
       '<code>SETUP.md</code> step 4.</div>';
     document.getElementById('sub').textContent = 'Not connected.';
     return;
   }
-  var btn = document.getElementById('refresh');
-  btn.disabled = true; btn.textContent = 'Loading...';
   fetch(u + (u.indexOf('?') > -1 ? '&' : '?') + 'action=summary&fresh=1',
         { redirect: 'follow' })
     .then(function(r){ return r.json(); })
     .then(function(d){
       data = d; err.innerHTML = '';
+      var sOpens = sum(d.sessions), pOpens = sum(d.speakers);
+      var li = sum(d.linkedinClicks), sp = sum(d.sponsorClicks);
+
       document.getElementById('t-visits').textContent = d.visits || 0;
-      document.getElementById('t-unique').textContent = d.uniqueVisits || 0;
-      document.getElementById('t-sessions').textContent = sum(d.sessions);
-      document.getElementById('t-speakers').textContent = sum(d.speakers);
+      var bt = document.getElementById('t-bounce');
+      bt.textContent = (d.bounceRate != null ? d.bounceRate : 0) + '%';
+      bt.className = (d.bounceRate || 0) > 55 ? 'bad' : 'good';
       document.getElementById('t-tickets').textContent = (d.clicks && d.clicks.ticket) || 0;
-      document.getElementById('t-out').textContent =
-        ((d.clicks && d.clicks.outbound) || 0) + ((d.clicks && d.clicks.linkedin) || 0);
+      document.getElementById('t-shawnlife').textContent = (d.clicks && d.clicks.shawnlife) || 0;
+      document.getElementById('t-linkedin').textContent = li;
+      document.getElementById('t-sponsor').textContent = sp;
+
+      document.getElementById('h-sessions').innerHTML =
+        'Session demand <small>&middot; ' + sOpens + ' opens</small>';
+      document.getElementById('h-speakers').innerHTML =
+        'Speaker interest <small>&middot; ' + pOpens + ' opens</small>';
+      document.getElementById('h-linkedin').innerHTML =
+        'LinkedIn clicked <small>&middot; ' + li + '</small>';
+      document.getElementById('h-sponsor').innerHTML =
+        'Sponsor clicked <small>&middot; ' + sp + '</small>';
+
       show('c-sessions', d.sessions);
       show('c-speakers', d.speakers);
-      show('c-outbound', d.outbound, true);
       show('c-filters', d.filters, true);
       show('c-tabs', d.tabs, true);
+      show('c-linkedin', d.linkedinClicks);
+      show('c-sponsor', d.sponsorClicks, true);
+      show('c-outbound', d.outbound, true);
       drawTime();
       document.getElementById('sub').textContent =
-        'Updated ' + new Date().toLocaleTimeString() + ', ' +
-        (d.total || 0) + ' events recorded in total.';
+        'Updated ' + new Date().toLocaleTimeString() + '.';
     })
     .catch(function(e){
       err.innerHTML = '<div class="err"><b>Could not reach the backend.</b><br>' +
@@ -357,20 +598,10 @@ function load(){
         'page, run <code>python3 -m http.server</code> in this folder and open ' +
         '<code>http://localhost:8000/dashboard.html</code> instead.</div>';
       document.getElementById('sub').textContent = 'Failed to update.';
-    })
-    .then(function(){ btn.disabled = false; btn.textContent = 'Refresh'; });
+    });
 }
 
-document.getElementById('refresh').addEventListener('click', load);
-document.getElementById('seturl').addEventListener('click', askUrl);
-document.getElementById('auto').addEventListener('click', function(){
-  auto = !auto;
-  this.setAttribute('aria-pressed', auto ? 'true' : 'false');
-  this.textContent = 'Auto-refresh: ' + (auto ? 'on' : 'off');
-  if(auto){ timer = setInterval(load, 60000); } else { clearInterval(timer); }
-});
-
-timer = setInterval(load, 60000);
+setInterval(load, 60000);
 load();
 </script>
 </body>

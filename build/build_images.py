@@ -23,7 +23,7 @@ SRC = ROOT / "source"
 HEADSHOT_SRC = SRC / "headshots"
 # Original logos live here, mirroring Headshots/. They used to sit loose in the
 # project root, which made it easy to drop copies into images/sponsors/ by
-# mistake and ship them. Sources in, generated files out — never mixed.
+# mistake and ship them. Sources in, generated files out, never mixed.
 LOGO_SRC = SRC / "logos"
 OUT = ROOT / "assets" / "images"
 OUT_HEADSHOTS = OUT / "headshots"
@@ -81,7 +81,7 @@ MANUAL_CROP = {}
 SPONSORS = {
     "0924974_0.webp": "resource-alliance",
     "CCA copy.webp": "cca",
-    "FBB.webp": "fundraising-beyond-borders",
+    "FBB_PrimaryLogoColor.png": "fundraising-beyond-borders",
     "DB.png": "donorbox",
     "DMI.webp": "downes-murray",
     "TPCA.webp": "turning-point",
@@ -100,7 +100,7 @@ SPONSORS = {
 # Raster: trim fully-transparent margins automatically.
 TRIM_TRANSPARENT = {"homecoming-centre"}
 # Vector: replace the viewBox to crop. Cooktastic is a circular badge on an
-# opaque white circle — invisible on the white sponsor panel — so the visible ink
+# opaque white circle, invisible on the white sponsor panel, so the visible ink
 # filled only 199x285 of its 500x500 canvas (measured). This crops to the ink
 # plus a little breathing room, losslessly.
 SVG_VIEWBOX = {"cooktastic": "140 97 220 305"}
@@ -223,7 +223,7 @@ def build_headshots():
         # Source photos are large and live outside git, so they go walkabout.
         # If every web copy is already built, carry on rather than blocking a
         # logo or hero rebuild for want of originals nothing currently needs.
-        print(f"  ! {HEADSHOT_SRC.name}/ not found — keeping the "
+        print(f"  ! {HEADSHOT_SRC.name}/ not found, keeping the "
               f"{len(already)} existing web copies.")
         print("    Restore the folder to re-crop or add a photo.")
         return {slug: None for slug in HEADSHOTS.values()}
@@ -383,7 +383,7 @@ def main():
     )
 
     total = sum(p.stat().st_size for p in OUT.rglob("*") if p.is_file())
-    print(f"\nOK — 24 headshots, 11 sponsor logos, 1 main logo.")
+    print(f"\nOK: 24 headshots, 11 sponsor logos, 1 main logo.")
     print(f"Total images/ size: {total / 1024 / 1024:.2f} MB")
 
 

@@ -56,7 +56,7 @@ def main():
         print(f"  {dest:<20} weight {weight}   "
               f"{before / 1024:5.0f} KB -> {after / 1024:5.0f} KB   <- {src}")
 
-    print(f"\nOK — {len(WEIGHTS)} weights, {total / 1024:.0f} KB total in fonts/")
+    print(f"\nOK: {len(WEIGHTS)} weights, {total / 1024:.0f} KB total in fonts/")
 
 
 if __name__ == "__main__":

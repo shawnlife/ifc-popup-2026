@@ -1,7 +1,7 @@
 """
 All the words on the IFC Cape Town Pop-Up 2026 site.
 
-This is the place to edit copy — speaker titles, bios, session descriptions,
+This is the place to edit copy: speaker titles, bios, session descriptions,
 times, sponsor links. After changing anything here, run:
 
     python3 build_site.py
@@ -30,7 +30,7 @@ BIO_PENDING = "Bio coming soon."
 # A "bio" may be a single string, or a list of strings for a multi-paragraph bio.
 
 # ---------------------------------------------------------------------------
-# Speakers — ordered alphabetically by first name, which is how attendees
+# Speakers, ordered alphabetically by first name, which is how attendees
 # scan a grid of 24 faces looking for someone.
 # ---------------------------------------------------------------------------
 
@@ -138,7 +138,7 @@ SPEAKERS = [
                "Systems, he works with nonprofits around the world who want to know why their "
                "systems succeed or break down. Fundraiser In The Room works with clients "
                "across Europe, Africa, Asia, and the Americas. Damian also serves as the "
-               "Chair of Rogare — the world's only fundraising think tank, and as a "
+               "Chair of Rogare, the world's only fundraising think tank, and as a "
                "Non-Executive Director for the Chartered Institute of Fundraising.",
     },
     {
@@ -218,7 +218,7 @@ SPEAKERS = [
         "linkedin": "https://www.linkedin.com/in/malusi-ntoyapi-62578917/",
         "bio": "Malusi Ntoyapi is a Programmes and Innovation Manager at the HCI Foundation, "
                "where he supports a wide range of South African not-for-profit organisations. "
-               "His work is grounded in Ubuntu — he believes that a strong, supported, and "
+               "His work is grounded in Ubuntu: he believes that a strong, supported, and "
                "organised not-for-profit community with a shared vision can ensure that no "
                "one is left behind. In 2015, he was named one of Mail & Guardian's Top 200 "
                "Young South Africans in Education.",
@@ -405,7 +405,7 @@ SPEAKERS = [
 ]
 
 # ---------------------------------------------------------------------------
-# Sessions. "speakers" entries are (speaker slug, note) — note appears in
+# Sessions. "speakers" entries are (speaker slug, note); note appears in
 # brackets after the name, e.g. "(Moderator)".
 # ---------------------------------------------------------------------------
 
@@ -541,8 +541,8 @@ SESSIONS = [
             "sustain and expand their charitable work. Traditional fundraising efforts often "
             "focus on government grants, corporate partnerships, and other Corporate Social "
             "Investment (CSI) initiatives. However, every contribution makes a difference. "
-            "This session will explore how developing a loyal base of recurring donors — "
-            "regardless of the size of their individual contributions — can create a "
+            "This session will explore how developing a loyal base of recurring donors, "
+            "regardless of the size of their individual contributions, can create a "
             "reliable and sustainable source of ongoing income over time.",
     },
     {
@@ -637,7 +637,7 @@ SCHEDULE = [
 # ---------------------------------------------------------------------------
 # Topic tags, used for the filter chips on the Sessions tab. The chips are
 # generated from whatever appears here, so renaming a topic or re-tagging a
-# session is all it takes — nothing else needs changing.
+# session is all it takes; nothing else needs changing.
 # ---------------------------------------------------------------------------
 
 TOPICS = {
@@ -660,7 +660,7 @@ TOPICS = {
 PANELS = {"session-1a", "session-3a"}
 
 # ---------------------------------------------------------------------------
-# "On the day" practical info — the fourth tab.
+# "On the day" practical info: the fourth tab.
 #
 # Each block has a heading plus either "items" (a bulleted list) or "body"
 # (paragraphs). "html" is rendered as-is rather than escaped, so it can hold a
@@ -687,7 +687,7 @@ INFO_BLOCKS = [
         "heading": "How to get there",
         "body": ["The Homecoming Centre, corner of Buitenkant and Caledon Street "
                  "(entrance on Caledon Street), District Six, Cape Town 7785.",
-                 "You can also take the train — Cape Town Station is about a 10-minute "
+                 "You can also take the train. Cape Town Station is about a 10-minute "
                  "walk away."],
         "links": [
             {"label": "Google Maps",
@@ -706,7 +706,7 @@ INFO_BLOCKS = [
     {
         "heading": "What to bring",
         "items": ["Something to take notes with as you learn",
-                  "A way to share your contact details as you network — business cards, "
+                  "A way to share your contact details as you network: business cards, "
                   "the LinkedIn app, or whatever works for you"],
     },
     {
@@ -739,7 +739,7 @@ INFO_OUTRO = "We are looking forward to seeing you on Wednesday, 2 September."
 #
 # What it records: which sessions and speaker profiles get opened, which tabs
 # and filters get used, ticket clicks. No cookies, no localStorage, no IP
-# logging, no demographics — so the site still needs no consent banner.
+# logging, no demographics, so the site still needs no consent banner.
 # ---------------------------------------------------------------------------
 ANALYTICS_URL = ("https://script.google.com/macros/s/AKfycbyCEpldevM42xqC-mcW8ar1WENK8HTlN1QmhYpVQUYbzfmgALZp5rVu4M8ss7rUKOXR/exec")
 
@@ -753,7 +753,7 @@ PHOTO_CREDIT = {"name": "LIFEbrand", "url": "https://lifebrand.co.za/"}
 
 
 # ---------------------------------------------------------------------------
-# Sponsors — displayed in this order, on white tiles (several logos are
+# Sponsors, displayed in this order, on white tiles (several logos are
 # dark-on-transparent and would vanish on the navy background).
 # ---------------------------------------------------------------------------
 
@@ -763,7 +763,7 @@ SPONSORS = [
     {"name": "CCA Recruitment & Consulting", "url": "https://www.charitycareersafrica.com/",
      "file": "cca.webp", "w": 600, "h": 137},
     {"name": "Fundraising Beyond Borders", "url": "https://fundraisingbeyondborders.com/",
-     "file": "fundraising-beyond-borders.webp", "w": 200, "h": 50},
+     "file": "fundraising-beyond-borders.png", "w": 600, "h": 151},
     {"name": "Donorbox", "url": "https://donorbox.org/",
      "file": "donorbox.png", "w": 485, "h": 104},
     {"name": "Downes Murray International", "url": "http://dmi.co.za/",

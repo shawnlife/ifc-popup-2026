@@ -23,7 +23,7 @@ def run(script, label):
     print(f"\n=== {label} " + "=" * (58 - len(label)))
     r = subprocess.run([sys.executable, str(BUILD / script)])
     if r.returncode != 0:
-        sys.exit(f"\n{label} step failed — stopping.")
+        sys.exit(f"\n{label} step failed, stopping.")
 
 
 def main():

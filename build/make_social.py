@@ -11,7 +11,7 @@ background. WhatsApp flattens transparency onto white, so it rendered as an
 empty white block. A share card has to be a flat image with a solid background
 and no alpha channel.
 
-Kept under 300KB deliberately — WhatsApp silently skips preview images larger
+Kept under 300KB deliberately: WhatsApp silently skips preview images larger
 than roughly that, which looks identical to having no image at all.
 """
 
@@ -45,7 +45,7 @@ def supported(text, path):
     """Characters the font can actually draw.
 
     PIL does not fall back to another font for a missing glyph, it draws
-    nothing — which is how the ampersands and middots silently vanished from
+    nothing, which is how the ampersands and middots silently vanished from
     the first version of this card. These Graphik trial weights carry only 74
     glyphs: no & : / | or dashes beyond a plain hyphen.
     (The website is unaffected: browsers do fall back per character.)
@@ -108,7 +108,7 @@ def use_supplied():
         print(f"  ! ratio {ratio:.2f}:1 is outside the 1.78-1.91 range platforms like;"
               " it may be cropped.")
     if kb > MAX_KB:
-        sys.exit(f"  ! still over {MAX_KB}KB — WhatsApp may skip it.")
+        sys.exit(f"  ! still over {MAX_KB}KB. WhatsApp may skip it.")
     return True
 
 
@@ -172,9 +172,9 @@ def main():
         if kb <= MAX_KB:
             break
 
-    print(f"Wrote {OUT.relative_to(ROOT)} — {W}x{H}, {kb:.0f} KB (quality {quality})")
+    print(f"Wrote {OUT.relative_to(ROOT)}: {W}x{H}, {kb:.0f} KB (quality {quality})")
     if kb > MAX_KB:
-        sys.exit(f"Still over {MAX_KB}KB — WhatsApp may skip it.")
+        sys.exit(f"Still over {MAX_KB}KB. WhatsApp may skip it.")
 
 
 if __name__ == "__main__":

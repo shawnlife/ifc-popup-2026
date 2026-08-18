@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IFC Pop-Up 2026 — Usage</title>
+<title>IFC Pop-Up 2026: Usage</title>
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" href="favicon.ico">
@@ -83,7 +83,7 @@ a{color:var(--orange)}
 </head>
 <body>
 <div class="wrap">
-  <h1>IFC Pop-Up 2026 &mdash; Usage</h1>
+  <h1>IFC Pop-Up 2026: Usage</h1>
   <p class="sub" id="sub">Loading&hellip;</p>
 
   <div class="bar">
@@ -95,12 +95,12 @@ a{color:var(--orange)}
   <div id="error"></div>
 
   <div class="tiles">
-    <div class="tile"><b id="t-visits">&mdash;</b><span>Visits</span></div>
-    <div class="tile"><b id="t-unique">&mdash;</b><span>Unique loads</span></div>
-    <div class="tile"><b id="t-sessions">&mdash;</b><span>Session opens</span></div>
-    <div class="tile"><b id="t-speakers">&mdash;</b><span>Profile opens</span></div>
-    <div class="tile"><b id="t-tickets">&mdash;</b><span>Ticket clicks</span></div>
-    <div class="tile"><b id="t-out">&mdash;</b><span>Outbound clicks</span></div>
+    <div class="tile"><b id="t-visits">&hellip;</b><span>Visits</span></div>
+    <div class="tile"><b id="t-unique">&hellip;</b><span>Unique loads</span></div>
+    <div class="tile"><b id="t-sessions">&hellip;</b><span>Session opens</span></div>
+    <div class="tile"><b id="t-speakers">&hellip;</b><span>Profile opens</span></div>
+    <div class="tile"><b id="t-tickets">&hellip;</b><span>Ticket clicks</span></div>
+    <div class="tile"><b id="t-out">&hellip;</b><span>Outbound clicks</span></div>
   </div>
 
   <div class="card">
@@ -198,7 +198,7 @@ document.addEventListener('click', function(ev){
   if(btn){
     var el = btn.getAttribute('data-all');
     document.getElementById('modal-title').textContent =
-      TITLES[el] + ' — all ' + SERIES[el].rows.length;
+      TITLES[el] + ': all ' + SERIES[el].rows.length;
     document.getElementById('modal-body').innerHTML =
       rowsHtml(SERIES[el].rows, SERIES[el].raw);
     document.getElementById('modal').hidden = false;
@@ -346,7 +346,7 @@ function load(){
       show('c-tabs', d.tabs, true);
       drawTime();
       document.getElementById('sub').textContent =
-        'Updated ' + new Date().toLocaleTimeString() + ' — ' +
+        'Updated ' + new Date().toLocaleTimeString() + ', ' +
         (d.total || 0) + ' events recorded in total.';
     })
     .catch(function(e){

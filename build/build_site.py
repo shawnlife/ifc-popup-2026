@@ -2,7 +2,7 @@
 """
 Generate index.html for the IFC Cape Town Pop-Up 2026 site.
 
-All copy lives in site_data.py — edit there, then run:
+All copy lives in site_data.py; edit there, then run:
 
     python3 build_site.py
 
@@ -191,7 +191,7 @@ header{
 }
 @media (min-width:760px){.slot{grid-template-columns:112px minmax(0,1fr);gap:18px;padding:14px 0}}
 /* nowrap + a column wide enough for the longest label, so every time sits on
-   one line — a mix of one- and two-line times looked ragged. */
+   one line: a mix of one- and two-line times looked ragged. */
 .slot-time{
   font-weight:700;font-size:.72rem;color:var(--orange);line-height:1.35;
   padding-top:12px;white-space:nowrap;font-variant-numeric:tabular-nums;
@@ -226,7 +226,7 @@ a.title::after{content:'\\00A0\\203A';color:var(--orange);font-weight:700}
 .card .detail{font-size:.87rem;color:var(--text);margin:0}
 .card .topics{margin-top:8px}
 
-/* Speaker headshot inline with their name — a name alone means nothing to
+/* Speaker headshot inline with their name: a name alone means nothing to
    someone who has never met them; a face at least makes them a person before
    the reader has tapped through. Shared by the Schedule and Sessions tabs.
    inline-flex so each name+photo wraps together as one unit, never splitting
@@ -471,19 +471,30 @@ html.modal-open #backpill{
 }
 
 /* ---------- sponsors ----------
-   One white panel, not nine tiles. White specifically: Donorbox and Downes
-   Murray have opaque white backgrounds baked in, so they only sit seamlessly on
-   white, while Turning Point's is opaque dark navy and reads as a dark logo.
-   Nine logos divide evenly into 3x3, so there is no orphan row. */
-.sponsors-wrap{margin-top:46px;padding:30px 0 34px;background:#fff;border-radius:16px}
-.sponsors-wrap h2{
-  margin:0 0 22px;text-align:center;font-size:.95rem;color:#303249;letter-spacing:.06em;
+   Full-bleed white, like the hero: the only other edge-to-edge moment on the
+   site, so this reads as a deliberate second "page break" rather than a
+   leftover rounded box. Heading sits on its own solid orange strip across the
+   top rather than as text on the white, since navy-on-white read flat and
+   bland. White specifically for the logo grid below: Donorbox and Downes
+   Murray have opaque white backgrounds baked in, so they only sit seamlessly
+   on white, while Turning Point's is opaque dark navy and reads as a dark
+   logo. Nine logos divide evenly into 3x3, so there is no orphan row. */
+.sponsors-wrap{
+  margin-top:46px;padding:0 0 36px;background:#fff;
+  margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);width:100vw;max-width:100vw;
 }
+.sponsors-wrap .strip{
+  margin:0 0 30px;padding:18px 20px;background:var(--orange);
+  text-align:center;font-size:1.05rem;color:#20213A;letter-spacing:.04em;
+}
+@media (min-width:640px){.sponsors-wrap .strip{font-size:1.2rem;padding:20px}}
 /* Centred flex rather than a fixed grid: the last row centres itself whatever
-   the sponsor count is, so adding one does not leave a ragged row. */
+   the sponsor count is, so adding one does not leave a ragged row. Capped to
+   the same width as the rest of the page's content so logos do not thin out
+   across a wide desktop screen. */
 .sponsors{
   display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;
-  gap:4px;list-style:none;margin:0;padding:0 12px;
+  gap:4px;list-style:none;margin:0 auto;max-width:var(--wrap);padding:0 12px;
 }
 .sponsors li{flex:0 0 calc(50% - 4px);display:flex}
 @media (min-width:640px){
@@ -511,7 +522,7 @@ footer{
   text-align:center;color:var(--muted);font-size:.84rem;
 }
 /* .wrap's own "padding:0 16px" is a class selector, which beats a plain
-   element selector like "footer" regardless of source order — so
+   element selector like "footer" regardless of source order, so
    footer{padding:38px 0 36px} was being silently zeroed on top/bottom, and
    the text sat right on the divider line. footer.wrap (0,1,0 + 0,0,1) wins. */
 footer.wrap{padding-top:38px;padding-bottom:36px;margin-top:44px}
@@ -533,14 +544,14 @@ TRACK_JS = """
   /* ------------- usage tracking: aggregate counts, no identifiers -------------
      Buffers events and flushes on a timer and on page-hide, so a visitor tapping
      round the schedule costs a handful of requests rather than one per tap.
-     The session id is random and lives in memory only — never stored, so it
+     The session id is random and lives in memory only, never stored, so it
      resets on reload and identifies nobody. */
   var TRACK_URL = '__TRACK_URL__';
   var tq = [], tsid = Math.random().toString(36).slice(2, 10), ttimer = null;
 
   // ?shawn on the URL (or in a previous history entry this tab visited, since
   // switching tabs rewrites the URL via pushState) suppresses tracking, so
-  // Shawn's own browsing — and anyone's manual QA of the live site — never
+  // Shawn's own browsing, and anyone's manual QA of the live site, never
   // pollutes real usage data. Persisted in sessionStorage so it survives
   // navigating around after landing on the ?shawn link.
   var PREVIEW = /[?&]shawn(?:&|=|$)/.test(location.search);
@@ -554,7 +565,7 @@ TRACK_JS = """
     if(!tq.length) return;
     var body = JSON.stringify({ sid: tsid, events: tq });
     tq = [];
-    if(PREVIEW) return;   // drop the batch — preview mode never sends
+    if(PREVIEW) return;   // drop the batch: preview mode never sends
     try { if(navigator.sendBeacon && navigator.sendBeacon(TRACK_URL, body)) return; }
     catch(err){}
     try { fetch(TRACK_URL, { method:'POST', mode:'no-cors', keepalive:true, body:body }); }
@@ -696,7 +707,7 @@ __TRACK_BLOCK__
     if(t.closest('[data-close]')){ ev.preventDefault(); closeModal(); return; }
     var btn = t.closest('.learn-btn');
     if(btn){ openModal(btn.closest('.spk')); return; }
-    // Anywhere on a speaker card opens the profile — except the real links on it
+    // Anywhere on a speaker card opens the profile, except the real links on it
     // (LinkedIn, and the session title), which do their own thing.
     var card = t.closest('.spk');
     if(card && !t.closest('a')){ openModal(card); return; }
@@ -880,7 +891,7 @@ def panel_head(title):
 
 
 def speaker_links(pairs):
-    """Renders speaker names as links, each with a small circular headshot —
+    """Renders speaker names as links, each with a small circular headshot:
     used on both the Schedule and Sessions tabs, so a name is never just text
     with no face attached to it."""
     out = []
@@ -1027,7 +1038,7 @@ def render_sessions():
 
 
 def session_lines(slug):
-    """The 'Speaking in' block — same markup on the card and in the modal."""
+    """The 'Speaking in' block: same markup on the card and in the modal."""
     out = []
     for s in SESSIONS_FOR.get(slug, []):
         out.append(f'<a href="#{s["anchor"]}">{e(s["title"])}</a>'
@@ -1121,15 +1132,19 @@ def render_info():
 
 
 def render_sponsors():
-    items = "".join(
-        f'<li><a href="{e(s["url"])}" target="_blank" rel="noopener" '
-        f'title="{e(s["name"])} (opens in a new tab)">'
-        f'<img src="assets/images/sponsors/{e(s["file"])}" width="{s["w"]}" height="{s["h"]}" '
-        f'loading="lazy" decoding="async" alt="{e(s["name"])}"></a></li>'
-        for s in D.SPONSORS
-    )
-    return ('<div class="sponsors-wrap"><h2>Thank You to Our Sponsors</h2>'
-            f'<ul class="sponsors">{items}</ul></div>')
+    items = []
+    for s in D.SPONSORS:
+        # "tall" (Homecoming Centre, Cooktastic) was set in site_data.py but
+        # never read here, so those two logos have been shipping undersized.
+        cls = ' class="tall"' if s.get("tall") else ""
+        items.append(
+            f'<li><a{cls} href="{e(s["url"])}" target="_blank" rel="noopener" '
+            f'title="{e(s["name"])} (opens in a new tab)">'
+            f'<img src="assets/images/sponsors/{e(s["file"])}" width="{s["w"]}" height="{s["h"]}" '
+            f'loading="lazy" decoding="async" alt="{e(s["name"])}"></a></li>'
+        )
+    return ('<div class="sponsors-wrap"><h2 class="strip">Thank You to Our Sponsors</h2>'
+            f'<ul class="sponsors">{"".join(items)}</ul></div>')
 
 
 def render_modal():
@@ -1196,7 +1211,7 @@ def render_page():
         f'{body}</section>'
         for pid, body in panels
     )
-    desc = (f"{ev['name']} — {ev['date']}, {ev['venue']}. "
+    desc = (f"{ev['name']} - {ev['date']}, {ev['venue']}. "
             "Full programme, sessions and speakers.")
 
     # Read the real dimensions off the card rather than hardcoding them: the
@@ -1236,7 +1251,7 @@ def render_page():
 <meta property="og:image:width" content="{card_w}">
 <meta property="og:image:height" content="{card_h}">
 <meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:alt" content="{e(ev['name'])} — {e(ev['date'])}">
+<meta property="og:image:alt" content="{e(ev['name'])} - {e(ev['date'])}">
 <meta property="og:site_name" content="{e(ev['name'])}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{SITE_URL}assets/images/social-card.jpg">
@@ -1321,7 +1336,7 @@ def write_analytics_names():
     out = ROOT / "analytics" / "names.js"
     if not out.parent.exists():
         return
-    out.write_text("/* Generated by build_site.py — do not edit. */\n"
+    out.write_text("/* Generated by build_site.py, do not edit. */\n"
                    "window.IFC_NAMES = "
                    + json.dumps(names, indent=2, ensure_ascii=False) + ";\n",
                    encoding="utf-8")
@@ -1336,11 +1351,11 @@ def main():
     n_ids, n_refs = validate(page)
     OUT.write_text(page, encoding="utf-8")
     write_analytics_names()
-    print(f"Wrote index.html — {OUT.stat().st_size / 1024:.0f} KB")
+    print(f"Wrote index.html ({OUT.stat().st_size / 1024:.0f} KB)")
     print(f"  {len(D.SCHEDULE)} schedule slots, {len(D.SESSIONS)} sessions, "
           f"{len(D.SPEAKERS)} speakers, {len(D.SPONSORS)} sponsors")
     print(f"  {len(ALL_TOPICS)} topics: " + ", ".join(ALL_TOPICS))
-    print(f"  {n_refs} internal links checked against {n_ids} anchors — all resolve")
+    print(f"  {n_refs} internal links checked against {n_ids} anchors, all resolve")
 
 
 if __name__ == "__main__":

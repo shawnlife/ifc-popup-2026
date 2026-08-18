@@ -1,11 +1,11 @@
-# Usage tracking — setup
+# Usage tracking - setup
 
 Fifteen minutes, once. Nothing is tracked until step 5.
 
 ## What this measures
 
-- **Session demand** — which sessions get opened, ranked
-- **Speaker interest** — whose profile gets opened, ranked
+- **Session demand** - which sessions get opened, ranked
+- **Speaker interest** - whose profile gets opened, ranked
 - **Every outbound link click**, labelled by what the visitor saw: individual
   sponsors, the train schedule, Google/Apple Maps, ShawnLife, and LinkedIn
   clicks recorded by *whose* profile it was
@@ -14,8 +14,8 @@ Fifteen minutes, once. Nothing is tracked until step 5.
   zooms to the last 48 hours, or focuses on the event day itself (07:00–18:00
   on 2 September)
 
-That is demand data you can act on — which rooms will overflow, whose profile
-everyone is reading — not demographics.
+That is demand data you can act on - which rooms will overflow, whose profile
+everyone is reading - not demographics.
 
 ## What it deliberately does not do
 
@@ -28,7 +28,7 @@ device, **the site still needs no cookie banner or consent prompt.** Keep it tha
 way: if you ever add GA4 or similar, that changes and you would need one.
 
 The one honest caveat: the endpoint is public (any client-side tracking has this
-problem — the URL has to be in the page). Someone determined could post junk
+problem - the URL has to be in the page). Someone determined could post junk
 events. The script only accepts a fixed list of event types and caps how many
 arrive per request, so the worst case is noisy counts, not a breach. If the
 numbers ever look absurd, the raw rows are in the Sheet and easy to filter.
@@ -38,7 +38,7 @@ numbers ever look absurd, the raw rows are in the Sheet and easy to filter.
 ## 1. Make the spreadsheet
 
 1. Go to [sheets.new](https://sheets.new)
-2. Name it something like **IFC Pop-Up 2026 — Usage**
+2. Name it something like **IFC Pop-Up 2026 - Usage**
 
 You do not need to add any headers. The script creates the `Events` sheet itself.
 
@@ -53,7 +53,7 @@ Open `apps_script.js` (next to this file), copy all of it, paste it into the
 editor, and click the save icon.
 
 Optional sanity check: pick `selfTest` from the function dropdown and press
-**Run**. The first run asks you to authorise it — that is Google asking whether
+**Run**. The first run asks you to authorise it - that is Google asking whether
 this script may touch your own spreadsheet; say yes. Check **Execution log** for
 a block of JSON, then delete the two `selftest` rows it added to the Events
 sheet.
@@ -65,7 +65,7 @@ sheet.
 3. Set:
    - **Execute as:** Me
    - **Who has access:** **Anyone** ← this matters. Not "Anyone with Google
-     account" — visitors are not signed in, so that setting silently blocks
+     account" - visitors are not signed in, so that setting silently blocks
      every event.
 4. **Deploy**, authorise if asked, then copy the **Web app URL**. It ends in
    `/exec`.
@@ -85,7 +85,7 @@ python3 build_site.py && git add -A && git commit -m "Enable usage tracking" && 
 ```
 
 While `ANALYTICS_URL` is `None`, **no tracking code is written into
-`index.html` at all** — not disabled, absent.
+`index.html` at all** - not disabled, absent.
 
 ## 6. Watch the numbers
 
@@ -93,15 +93,15 @@ Open `analytics/dashboard.html` in your browser. Click **Change URL**, paste the
 same `/exec` URL, and it will load. It refreshes every 60 seconds.
 
 The ranked lists show the top 5; **See all** opens the full list in a pop-up.
-The chart has three views — **Hourly** (last 48 hours), **Daily**, and
+The chart has three views - **Hourly** (last 48 hours), **Daily**, and
 **Event day** (07:00–18:00 on 2 September). If the event date ever moves, change
 `EVENT_DAY` near the top of the dashboard's script.
 
 ### Testing the live site without polluting your own data
 
 Open `https://ifc.shawnlife.com/?shawn` instead of the plain URL. Tracking is
-suppressed for the whole visit — switching tabs, opening profiles, using
-filters, all of it — nothing is sent. This also covers any manual QA of the
+suppressed for the whole visit - switching tabs, opening profiles, using
+filters, all of it - nothing is sent. This also covers any manual QA of the
 live site; use the `?shawn` link rather than the plain one.
 
 If the browser blocks it from a `file://` page, run this in the `analytics`

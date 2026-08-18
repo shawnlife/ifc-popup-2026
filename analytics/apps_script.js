@@ -1,12 +1,12 @@
 /**
- * IFC Cape Town Pop-Up 2026 — usage tracking backend.
+ * IFC Cape Town Pop-Up 2026: usage tracking backend.
  *
  * This is a REFERENCE COPY. The live version lives in Google Apps Script.
  * See SETUP.md for how to deploy it.
  *
  * What it does:
- *   doPost  — the site sends batches of events; they get appended to the Events sheet
- *   doGet   — ?action=summary returns aggregated counts as JSON for the dashboard
+ *   doPost  : the site sends batches of events; they get appended to the Events sheet
+ *   doGet   : ?action=summary returns aggregated counts as JSON for the dashboard
  *
  * What it deliberately does NOT store: no IP addresses, no user agents, no
  * cookies, no names, nothing that identifies a person. Just "someone opened
@@ -128,8 +128,8 @@ function buildSummary_() {
     else if (type === 'linkedin') {
       clicks.linkedin++;
       speakers[target] = speakers[target] || 0;   // keep zero-open profiles listed
-      outbound['LinkedIn — ' + (target || 'unknown')] =
-        (outbound['LinkedIn — ' + (target || 'unknown')] || 0) + 1;
+      outbound['LinkedIn: ' + (target || 'unknown')] =
+        (outbound['LinkedIn: ' + (target || 'unknown')] || 0) + 1;
     }
     else if (type === 'outbound') {
       clicks.outbound++;

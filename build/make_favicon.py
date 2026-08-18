@@ -4,7 +4,7 @@ Build the favicon for the usage dashboard, from the IFC logo itself.
 
     python3 build/make_favicon.py
 
-The full logo is "IFC / POP-UP / CAPE TOWN" stacked — unreadable at 16px. This
+The full logo is "IFC / POP-UP / CAPE TOWN" stacked, unreadable at 16px. This
 crops to just the "IFC" glyphs (found automatically from the logo's own alpha
 channel, so a redrawn logo re-crops correctly without hand-tuned coordinates),
 pads it onto a navy square, and writes the sizes browsers ask for.
@@ -40,7 +40,7 @@ def find_band(alpha, axis):
 
 def main():
     if not LOGO.exists():
-        raise SystemExit(f"Logo not found: {LOGO} — run build_images.py first.")
+        raise SystemExit(f"Logo not found: {LOGO}. Run build_images.py first.")
 
     import numpy as np
     img = Image.open(LOGO).convert("RGBA")

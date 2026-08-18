@@ -130,7 +130,12 @@ header{
 
 /* ---------- panels ---------- */
 [role=tabpanel]{padding:22px 0 8px;scroll-margin-top:calc(var(--nav-h) + 8px)}
-.panel-head{margin:0 0 4px;font-size:1.4rem;line-height:1.2}
+.panel-head-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 10px;margin:0 0 4px}
+.panel-head{margin:0;font-size:1.4rem;line-height:1.2}
+.panel-flag{
+  font-size:.68rem;font-weight:600;letter-spacing:.02em;color:var(--muted);
+  text-transform:none;white-space:nowrap;
+}
 .panel-sub{margin:0 0 20px;color:var(--muted);font-size:.92rem}
 
 /* ---------- hero ---------- */
@@ -502,12 +507,16 @@ html.modal-open #backpill{
 @media (min-width:640px){.sponsors a.tall img{max-height:96px}}
 
 footer{
-  border-top:1px solid var(--line);padding:38px 0 36px;
+  border-top:1px solid var(--line);
   text-align:center;color:var(--muted);font-size:.84rem;
 }
-/* Needs to out-specify .wrap's "margin:0 auto", which would zero this out. */
-footer.wrap{margin-top:44px}
+/* .wrap's own "padding:0 16px" is a class selector, which beats a plain
+   element selector like "footer" regardless of source order — so
+   footer{padding:38px 0 36px} was being silently zeroed on top/bottom, and
+   the text sat right on the divider line. footer.wrap (0,1,0 + 0,0,1) wins. */
+footer.wrap{padding-top:38px;padding-bottom:36px;margin-top:44px}
 footer p{margin:0 0 10px}
+footer .asterisk-note{font-size:.76rem;opacity:.8;margin:0 0 14px}
 footer .tickets{color:var(--orange);font-weight:700;text-decoration:underline;
   text-underline-offset:2px}
 footer .tickets:hover{color:#ffa61f}
@@ -863,6 +872,13 @@ EXT_SVG = ('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path 
 # Rendering
 # ---------------------------------------------------------------------------
 
+def panel_head(title):
+    """Heading for a tab that carries the schedule disclaimer, with a small
+    asterisk matching the one in the footer note (see render_page)."""
+    return (f'<div class="panel-head-row"><h2 class="panel-head">{e(title)}</h2>'
+            f'<span class="panel-flag">*Subject to change</span></div>')
+
+
 def speaker_links(pairs):
     """Renders speaker names as links, each with a small circular headshot —
     used on both the Schedule and Sessions tabs, so a name is never just text
@@ -952,7 +968,7 @@ def render_schedule():
     </div>"""
 
     return (hero
-            + '<h2 class="panel-head">Programme</h2>'
+            + panel_head('Programme')
             + '<p class="panel-sub">Tap any session title or speaker name for the full '
               'details.</p>'
             + '<div class="schedule">' + "".join(rows) + '</div>')
@@ -1002,7 +1018,7 @@ def render_sessions():
             f'{who}<p class="desc">{e(s["description"])}</p></article>'
         )
 
-    return ('<h2 class="panel-head">Sessions</h2>'
+    return (panel_head('Sessions') +
             f'<p class="panel-sub">{len(D.SESSIONS)} sessions across the Star and Avalon '
             'theatres. Filter below, or tap a speaker name for their profile.</p>'
             + render_filters()
@@ -1057,7 +1073,7 @@ def render_speakers():
             f'{detail}</article>'
         )
 
-    return ('<h2 class="panel-head">Speakers</h2>'
+    return (panel_head('Speakers') +
             f'<p class="panel-sub">{len(D.SPEAKERS)} speakers, listed alphabetically. '
             'Tap “Learn more” for a full profile.</p>'
             '<div class="speakers">' + "".join(cards) + '</div>')
@@ -1245,6 +1261,7 @@ def render_page():
   <p><b>{e(ev['name'])}</b> &middot; {e(ev['date'])} &middot; {e(ev['venue'])}
     &middot; <a class="tickets" href="{e(ev['tickets_url'])}" target="_blank"
       rel="noopener">Get Your Tickets</a></p>
+  <p class="asterisk-note">*Schedule, sessions and speakers are subject to change.</p>
   <p class="credit">Tool made using AI vibe-coding by
     <a href="https://shawnlife.com" target="_blank" rel="noopener">ShawnLife</a></p>
 </footer>

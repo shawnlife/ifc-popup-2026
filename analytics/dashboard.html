@@ -544,6 +544,34 @@ document.getElementById('custom-from').addEventListener('change', drawTime);
 document.getElementById('custom-to').addEventListener('change', drawTime);
 
 /* ---------------- load, every 60s, always on --------------------------- */
+// Apps Script web apps are known to intermittently return an HTML wrapper
+// page (or an empty body) instead of the actual JSON, especially in the
+// minutes after a fresh redeploy or under concurrent load, e.g. real
+// conference traffic. That's a transient hiccup, not the endpoint being
+// down, so retry a few times a beat apart before treating it as failed.
+var FETCH_RETRIES = 4;
+var FETCH_RETRY_DELAY = 1200;
+
+function fetchSummary(u, attempt){
+  return fetch(u + (u.indexOf('?') > -1 ? '&' : '?') + 'action=summary&fresh=1',
+        { redirect: 'follow', cache: 'no-store' })
+    .then(function(r){ return r.text(); })
+    .then(function(txt){
+      var d;
+      try { d = JSON.parse(txt); }
+      catch(e){ throw new Error('Got a non-JSON response (attempt ' + attempt + ').'); }
+      if(!d || typeof d.visits !== 'number'){
+        throw new Error('Response did not look like a summary (attempt ' + attempt + ').');
+      }
+      return d;
+    })
+    .catch(function(e){
+      if(attempt >= FETCH_RETRIES) throw e;
+      return new Promise(function(resolve){ setTimeout(resolve, FETCH_RETRY_DELAY); })
+        .then(function(){ return fetchSummary(u, attempt + 1); });
+    });
+}
+
 function load(){
   var u = url(), err = document.getElementById('error');
   if(!u){
@@ -553,9 +581,7 @@ function load(){
     document.getElementById('sub').textContent = 'Not connected.';
     return;
   }
-  fetch(u + (u.indexOf('?') > -1 ? '&' : '?') + 'action=summary&fresh=1',
-        { redirect: 'follow' })
-    .then(function(r){ return r.json(); })
+  fetchSummary(u, 1)
     .then(function(d){
       data = d; err.innerHTML = '';
       var sOpens = sum(d.sessions), pOpens = sum(d.speakers);
@@ -591,13 +617,17 @@ function load(){
         'Updated ' + new Date().toLocaleTimeString() + '.';
     })
     .catch(function(e){
-      err.innerHTML = '<div class="err"><b>Could not reach the backend.</b><br>' +
-        esc(String(e)) + '<br><br>Usual causes: the web app is not deployed with ' +
-        'access set to <b>Anyone</b>, or the URL is wrong (it must end in ' +
-        '<code>/exec</code>). If the browser blocks it from a <code>file://</code> ' +
-        'page, run <code>python3 -m http.server</code> in this folder and open ' +
-        '<code>http://localhost:8000/dashboard.html</code> instead.</div>';
-      document.getElementById('sub').textContent = 'Failed to update.';
+      err.innerHTML = '<div class="err"><b>Could not get a clean reading after ' +
+        FETCH_RETRIES + ' tries.</b><br>' + esc(String(e)) +
+        '<br><br>Apps Script web apps sometimes return a broken response for a few ' +
+        'requests in a row under real traffic, which is most likely what this is, ' +
+        'not the endpoint being down. It will try again automatically in under a ' +
+        'minute. If it stays stuck for several minutes: check the web app is still ' +
+        'deployed with access set to <b>Anyone</b>, or that the URL is right (it ' +
+        'must end in <code>/exec</code>). If the browser blocks it from a ' +
+        '<code>file://</code> page, run <code>python3 -m http.server</code> in this ' +
+        'folder and open <code>http://localhost:8000/dashboard.html</code> instead.</div>';
+      document.getElementById('sub').textContent = 'Failed to update, retrying automatically.';
     });
 }
 

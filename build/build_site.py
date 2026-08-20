@@ -15,6 +15,7 @@ session or speaker name can never lead nowhere.
 import html
 import re
 import sys
+import urllib.parse
 from pathlib import Path
 
 import site_data as D
@@ -593,7 +594,7 @@ TRACK_JS = """
   document.addEventListener('click', function(ev){
     var a = ev.target && ev.target.closest ? ev.target.closest('a[href^="http"]') : null;
     if(!a) return;
-    if(a.href.indexOf('qkt.io') > -1){ track('ticket', ''); return; }
+    if(a.href.indexOf('__TICKET_HOST__') > -1){ track('ticket', ''); return; }
     if(a.classList.contains('li')){
       // Record whose profile, not the word "LinkedIn".
       var card = a.closest('.spk');
@@ -604,6 +605,11 @@ TRACK_JS = """
     }
     if(a.closest('.sponsors')){ track('sponsor', outLabel(a)); return; }
     if(a.closest('footer .credit')){ track('shawnlife', ''); return; }
+    // The Info tab's "Get social" paragraph also links out to LinkedIn (IFC's
+    // own page, Resource Alliance, CCA) but as plain inline links, not the
+    // .li button used on speaker cards. Catch those here too, or they fall
+    // into the generic bucket below and read like a map/train link.
+    if(a.href.indexOf('linkedin.com') > -1){ track('linkedin', outLabel(a)); return; }
     // Whatever is left: the Info tab's map and train-schedule links.
     track('outbound', outLabel(a));
   });
@@ -1194,7 +1200,13 @@ def tracking_js():
     url = getattr(D, "ANALYTICS_URL", None)
     if not url:
         return "  function track(){}   /* usage tracking not configured */"
-    return TRACK_JS.replace("__TRACK_URL__", url)
+    # Ticket-click detection is derived from the actual configured ticket URL's
+    # hostname, not a second hardcoded string. Changing tickets_url in one
+    # place (e.g. swapping to a tracked campaign link) can't silently break
+    # click tracking the way a stale hardcoded 'qkt.io' check would.
+    ticket_host = urllib.parse.urlparse(D.EVENT["tickets_url"]).hostname or "qkt.io"
+    return (TRACK_JS.replace("__TRACK_URL__", url)
+                    .replace("__TICKET_HOST__", ticket_host))
 
 
 def render_page():

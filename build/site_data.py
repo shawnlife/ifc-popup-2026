@@ -14,7 +14,13 @@ EVENT = {
     "headline": "Welcome to the IFC Cape Town Pop-Up 2026",
     "date": "2 September 2026",
     "venue": "Homecoming Centre, District Six, Cape Town",
-    "tickets_url": "https://qkt.io/IFCCPT2026",
+    # Shawn's own tracked campaign link (ref=/lc= params so Quicket's own
+    # analytics attribute sales back to this site), not the plain qkt.io
+    # short link. If this ever changes again, nothing else needs editing:
+    # the ticket-click detection in TRACK_JS is derived from this URL's
+    # hostname at build time, not a second hardcoded string to keep in sync.
+    "tickets_url": ("https://www.quicket.co.za/events/376046-ifc-cape-town-pop-up-2026/"
+                    "?ref=link-campaign&lc=schedule-page"),
     "logo": {"file": "logo.png", "w": 800, "h": 620},
     # Hero background photo, from the 2025 Pop-Up. One of the slugs in
     # build_images.py HEROES: "theatre-blue", "stage-amber", "audience".
